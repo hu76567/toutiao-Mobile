@@ -52,7 +52,7 @@ const routes = [
     path: '/search/result',
     component: searchresult
   }, {
-    path: 'article',
+    path: '/article',
     component: article
   }
 ]

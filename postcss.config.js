@@ -4,7 +4,7 @@ module.exports = {
   plugins: {
     // 给css样式加前缀的属性 display:flex
     autoprefixer: {},
-    'postcss-pxtrem': {
+    'postcss-pxtorem': {
       rootValue: 37.5, // 基准值
       propList: ['*'] // 所有文件都转化rem
     }
