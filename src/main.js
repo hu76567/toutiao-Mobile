@@ -8,6 +8,9 @@ import Vant from 'vant'
 // 引入样式
 import 'vant/lib/index.css'
 // 注册Vant组件
+
+// 引入flex布局
+import 'amfe-flexible'
 Vue.use(Vant)
 
 Vue.config.productionTip = false
