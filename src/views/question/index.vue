@@ -1,5 +1,5 @@
 <template>
-  <div>问答页面</div>
+  <div>问答模块</div>
 </template>
 
 <script>
