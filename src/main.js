@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import '@/permission' // 权限拦截模块
 import store from './store'
 // 完整导入vant  后期优化需要按需加载
 // 引用Vant组件

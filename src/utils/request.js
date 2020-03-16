@@ -58,7 +58,7 @@ instance.interceptors.response.use(
         path: '/login',
         query: {
           // 需要传递的query参数
-          redirectUrl: router.currentRoute.fullpath // 登录页需要跳转的地址
+          redirectUrl: router.currentRoute.fullPath // 登录页需要跳转的地址
         }
       }
       if (store.state.user.refresh_token) {
@@ -97,7 +97,7 @@ instance.interceptors.response.use(
           path: '/login',
           query: {
             // 需要传递的query参数
-            redirectUrl: router.currentRoute.fullpath // 登录页需要跳转的地址
+            redirectUrl: router.currentRoute.fullPath // 登录页需要跳转的地址
           }
         })
       }
