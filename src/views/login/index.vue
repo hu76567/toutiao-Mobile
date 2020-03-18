@@ -14,7 +14,7 @@
     </van-cell-group>
     <div class='btn-box'>
       <!-- 做表单校验 -->
-      <van-button class="login" @click="login" type="info" size="small" round block>登录</van-button>
+      <van-button @click="login" type="info" size="small" round block>登录</van-button>
     </div>
   </div>
 </template>
@@ -99,9 +99,5 @@ export default {
 <style scoped lang="less">
 .btn_box{
   padding: 10px;
-   .login{
-     margin: 0 auto;
-     text-align: center;
-   }
 }
 </style>
