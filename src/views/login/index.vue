@@ -20,6 +20,9 @@
 </template>
 
 <script>
+// 引入user中的login方法
+import { login } from '@/api/user'
+import { mapMutations } from 'vuex' // 把mutations函数映射到methods中
 export default {
   data () {
     return {
@@ -36,9 +39,10 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['updateUser']), // 把vuex中updateUser方法映射
     checkMobile () {
     // 手机号校验  非空  格式  null 空 undefined取反为true
-      if (!this.loginForm.mibile) {
+      if (!this.loginForm.mobile) {
         this.errorMseeage.mobile = '手机号不能为空奥'
         return false // 此轮校验未通过
       }
@@ -65,10 +69,23 @@ export default {
       this.errorMseeage.mobile = '' // 通过了不提示消息了
       return true
     },
-    login () {
+    async login () {
     //  登录校验
       if (this.checkMobile() && this.checkCode()) {
-        console.log('校验通过')
+        // console.log('校验通过')
+        try {
+          // 调用登录方法
+          const res = await login(this.loginForm) // 返回的值有token和refresh_token
+          this.updateUser({ user: res }) // 更新token 和refreshtoken
+
+          // 判断是否有需要跳转的页面？ 还是直接登录调到主页
+          // redirectUrl是否有值
+          const { redirectUrl } = this.$route.query // query参数 ?后面的参数
+          this.$router.push(redirectUrl || '/') // 短路表达式 前true执行前,前为false执行后
+        } catch (error) {
+          // 登录不成功的时候  提示消息
+          this.$notify({ message: '用户信息不正确,登录失败', duration: 2000 })
+        }
       }
     }
   }
