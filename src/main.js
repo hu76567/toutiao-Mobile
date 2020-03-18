@@ -17,7 +17,7 @@ import 'amfe-flexible'
 import plugin from '@/utils/plugin'
 
 Vue.use(Vant)
-// 注册插件 要放在vue.use(vant)之后
+// 初始化插件 要放在vue.use(vant)之后
 Vue.use(plugin)
 
 Vue.config.productionTip = false

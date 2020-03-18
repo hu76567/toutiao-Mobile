@@ -2,25 +2,32 @@
     <div class='container'>
      <van-tabs>
        <!-- title为显示内容 -->
-        <van-tab :title="`标签${item}`" v-for="item in 20" :key="item">
+        <van-tab :title="`标签${item}`" v-for="item in 10" :key="item">
            <!-- 列表单元格 -->
            <!-- 类名控制滚动 -->
-           <div class="scroll-wrapper">
+           <!-- <div class="scroll-wrapper">
               <van-cell-group>
                 <van-cell title="标题" value="内容" v-for="item in 30" :key="item"></van-cell>
               </van-cell-group>
-           </div>
+           </div> -->
+           <ArticleList></ArticleList>
           </van-tab>
      </van-tabs>
+     <!-- 在tabs下放置图标  编辑频道的图标 -->
      <span class="bar_btn">
+        <!-- 放入图标 vant图标 -->
        <van-icon name="wap-nav"></van-icon>
      </span>
   </div>
 </template>
 
 <script>
+import ArticleList from './components/article-list'
 export default {
-  name: 'home'
+  name: 'home',
+  components: {
+    ArticleList
+  }
 }
 </script>
 <style lang="less" scoped>

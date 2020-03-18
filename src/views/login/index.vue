@@ -14,7 +14,7 @@
     </van-cell-group>
     <div class='btn-box'>
       <!-- 做表单校验 -->
-      <van-button @click="login" type="info" size="small" round block>登录</van-button>
+      <van-button style="width:180px;margin:20px auto;" @click="login" type="info" size="small" round block>登录</van-button>
     </div>
   </div>
 </template>
@@ -87,7 +87,8 @@ export default {
         } catch (error) {
           // 登录不成功的时候  提示消息
           // 使用自己提供的自定义函数
-          this.$hnotify({ message: '用户信息不正确,登录失败' })
+          // 引入 Notify 组件后，会自动在 Vue 的 prototype 上挂载 $notify 方法
+          this.$hnotify({ type: 'danger', message: '用户信息不正确,登录失败' })
         }
       }
     }
