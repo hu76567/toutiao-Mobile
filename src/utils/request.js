@@ -100,7 +100,7 @@ instance.interceptors.response.use(
           router.push(path)
         }
       } else {
-        //  如果没有refresh_token 直接宣布over 直接跳到登录页面
+        // 如果没有refresh_token 直接宣布game over 直接跳到登录页面
         // router.push('/login')  直接跳转是不对的,需要更复杂的情景
         // A页面发请求 结果token失效了而且也没有refresh_token,
         // 只能回到login,你登录之后, 希望继续回到A页面
