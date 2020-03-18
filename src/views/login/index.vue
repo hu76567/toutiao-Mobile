@@ -14,7 +14,7 @@
     </van-cell-group>
     <div class='btn-box'>
       <!-- 做表单校验 -->
-      <van-button @click="login" type="info" size="small" round block>登录</van-button>
+      <van-button class="login" @click="login" type="info" size="small" round block>登录</van-button>
     </div>
   </div>
 </template>
@@ -71,7 +71,9 @@ export default {
     },
     async login () {
     //  登录校验
-      if (this.checkMobile() && this.checkCode()) {
+      const validataMobile = this.checkMobile()
+      const validataCode = this.checkCode()
+      if (validataMobile && validataCode) {
         // console.log('校验通过')
         try {
           // 调用登录方法
@@ -84,7 +86,8 @@ export default {
           this.$router.push(redirectUrl || '/') // 短路表达式 前true执行前,前为false执行后
         } catch (error) {
           // 登录不成功的时候  提示消息
-          this.$notify({ message: '用户信息不正确,登录失败', duration: 2000 })
+          // 使用自己提供的自定义函数
+          this.$hnotify({ message: '用户信息不正确,登录失败' })
         }
       }
     }
@@ -96,5 +99,9 @@ export default {
 <style scoped lang="less">
 .btn_box{
   padding: 10px;
+   .login{
+     margin: 0 auto;
+     text-align: center;
+   }
 }
 </style>

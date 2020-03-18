@@ -13,7 +13,12 @@ import 'vant/lib/index.less'
 import '@/styles/index.less'
 // 引入flex布局
 import 'amfe-flexible'
+
+import plugin from '@/utils/plugin'
+
 Vue.use(Vant)
+// 注册插件 要放在vue.use(vant)之后
+Vue.use(plugin)
 
 Vue.config.productionTip = false
 
