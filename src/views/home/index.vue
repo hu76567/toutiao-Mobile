@@ -30,13 +30,14 @@ export default {
     }
   },
   methods: {
+    // 定义一个方法来发请求
     async getmyChannels () {
       const data = await getmyChannels() // 这个是请求
       this.channels = data.channels // 赋值给data中
     }
   },
   created () {
-    // 获取频道数据
+    // 调用刚才的方法来获取频道数据
     this.getmyChannels()
   }
 }

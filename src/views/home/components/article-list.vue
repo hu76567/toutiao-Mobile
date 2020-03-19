@@ -2,8 +2,15 @@
   <!-- 文章列表组件 -->
   <!-- 放置这个div的目的是形成滚动条,用于做阅读记忆 -->
   <div class="scroll-wrapper">
-    <!-- 当组件滚动到底部时， 检测长度 会触发load事件 loading => true -->
+    <!-- 下拉刷新解构 -->
+    <!-- 下拉刷新时会触发@refresh -->
+    <!-- v-model控制是否加载完成 -->
+    <!-- 因为刷新时对整个列表刷新,所以需要包裹列表组件 -->
     <van-pull-refresh v-model="refreshed" @refresh="onRefresh" :success-text="successText">
+      <!-- van-list组件 如果不加干涉, 初始化完毕 就会检测 自己距离底部的长度-->
+      <!-- 如果超过了限定 ,就会执行 load事件 -->
+      <!-- 自动把绑定的 loading 变成true -->
+      <!-- 上拉加载列表组件 -->
       <van-list finished-text="亲,没有数据了哦" @load="onLoad" :finished="finished" v-model="loading">
         <van-cell-group>
           <!-- item.art_id 此时是一个大数字的对象 v-for 的key需要用字符串或者数字代理 -->
@@ -11,13 +18,14 @@
             <div class="article_item">
               <h3 class="van-ellipsis">{{item.title}}</h3>
               <!-- 根据封面类型决定是三图 单图 还是 无图 -->
+              <!-- 三图 -->
               <div class="img_box" v-if="item.cover.type===3">
                 <van-image class="w33" fit="cover" :src="item.cover.images[0]"/>
                 <van-image class="w33" fit="cover" :src="item.cover.images[1]"/>
                 <van-image class="w33" fit="cover" :src="item.cover.images[2]"/>
               </div>
               <!-- 单图 -->
-                <div class="img_box" v-if="item.cover.type===1">
+              <div class="img_box" v-if="item.cover.type===1">
                 <van-image class="w100" fit="cover" :src="item.cover.images[0]"/>
               </div>
               <!-- 作者信息 -->
@@ -44,12 +52,12 @@ export default {
   name: 'article-list',
   data () {
     return {
-      successText: '', // 下拉成功提示
+      successText: '', // 下拉刷新成功的提示
       refreshed: false, // 是否开启下拉刷新
       loading: false, // 是否开启上拉加载,默认为false
       finished: false, // 是否完成所有数据加载
       articles: [], // 文章列表数组
-      timestamp: null // 用于存储历史时间戳
+      timestamp: null // 用来存放时间戳
     }
   },
   props: {
@@ -63,24 +71,25 @@ export default {
   methods: {
     // 上拉加载
     async onLoad () {
-      // 模拟数据
-      // if (this.articles.length > 50) {
-      //   // 表示数据全部加载完成
-      //   this.finished = true
-      // } else {
-      //   const arr = Array.from(
-      //     Array(15),
-      //     (value, index) => this.articles.length + index + 1
-      //   )
-      //   // 把数据加载到数组的队尾
-      //   this.articles.push(...arr)
-      //   // 添加完数据关闭loading
-      //   this.loading = false
-      // }
+      /**
+       if (this.articles.length > 50) {
+        // 表示数据全部加载完成
+        this.finished = true
+      } else {
+        const arr = Array.from(
+          Array(15),
+          (value, index) => this.articles.length + index + 1
+        )
+        // 把数据加载到数组的队尾
+        this.articles.push(...arr)
+        // 添加完数据关闭loading
+        this.loading = false
+      } */
 
       // 延迟处理函数
       await this.$sleep()
       // 如果有历史时间戳用历史时间戳,没有就用当前时间
+      // 第一次加载, 时间戳的是空的, 所以给当前时间戳
       const res = await getArticles({ channel_id: this.channel_id, timestamp: this.timestamp || Date.now() })
       // 把取回的数据追加在队尾
       this.articles.push(...res.results)
@@ -98,18 +107,20 @@ export default {
     },
     // 下拉刷新
     async onRefresh () {
-      // 下拉刷新, 读取新数据 ,新数据在articles头部
-      // setTimeout(() => {
-      //   const arr = Array.from(
-      //     Array(7),
-      //     (value, index) => '追加' + (index + 1)
-      //   )
-      //   // 加到数组头部
-      //   this.articles.unshift(...arr)
-      //   // 关闭下拉刷新状态
-      //   this.refreshed = false
-      //   this.successText = `成功加载了${arr.length}条数据`
-      // }, 1500)
+    /** *
+     下拉刷新, 读取新数据 ,新数据在articles头部
+      setTimeout(() => {
+        const arr = Array.from(
+          Array(7),
+          (value, index) => '追加' + (index + 1)
+        )
+        // 加到数组头部
+        this.articles.unshift(...arr)
+        // 关闭下拉刷新状态
+        this.refreshed = false
+        this.successText = `成功加载了${arr.length}条数据`
+      }, 1500)
+     * ***/
 
       // 强制等待,人为控制请求时间 在utils/plugin
       // 防止用户刷新太频繁
@@ -136,7 +147,7 @@ export default {
         }
       } else {
         // 如果换不来新数据
-        this.successText = '当前已经是最新了'
+        this.successText = '当前已经是最新了哦'
       }
     }
   }
