@@ -2,15 +2,10 @@
     <div class='container'>
      <van-tabs>
        <!-- title为显示内容 -->
-        <van-tab :title="`标签${item}`" v-for="item in 10" :key="item">
+        <van-tab :title="item.name" v-for="item in channels" :key="item.id">
            <!-- 列表单元格 -->
-           <!-- 类名控制滚动 -->
-           <!-- <div class="scroll-wrapper">
-              <van-cell-group>
-                <van-cell title="标题" value="内容" v-for="item in 30" :key="item"></van-cell>
-              </van-cell-group>
-           </div> -->
-           <ArticleList></ArticleList>
+           <!-- 需要将频道id、传递给列表组件  父传子 -->
+           <ArticleList :channel_id="item.id"></ArticleList>
           </van-tab>
      </van-tabs>
      <!-- 在tabs下放置图标  编辑频道的图标 -->
@@ -23,10 +18,26 @@
 
 <script>
 import ArticleList from './components/article-list'
+import { getmyChannels } from '@/api/channels'
 export default {
   name: 'home',
   components: {
     ArticleList
+  },
+  data () {
+    return {
+      channels: []
+    }
+  },
+  methods: {
+    async getmyChannels () {
+      const data = await getmyChannels() // 这个是请求
+      this.channels = data.channels // 赋值给data中
+    }
+  },
+  created () {
+    // 获取频道数据
+    this.getmyChannels()
   }
 }
 </script>
