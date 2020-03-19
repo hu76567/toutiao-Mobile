@@ -6,7 +6,26 @@
     <van-pull-refresh v-model="refreshed" @refresh="onRefresh" :success-text="successText">
       <van-list finished-text="亲,没有数据了哦" @load="onLoad" :finished="finished" v-model="loading">
         <van-cell-group>
-          <van-cell v-for="item in articles" :key="item" title="美股熔断" :value="'天台排队'+item"></van-cell>
+          <van-cell v-for="item in articles" :key="item">
+            <!-- 放置列表循环项 -->
+            <!-- 三图 -->
+            <div class="article_item">
+              <h3 class="van-ellipsis">哈哈哈哈哈这是标题</h3>
+              <div class="img_box">
+                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+                <van-image class="w33" fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              </div>
+              <div class="info_box">
+                <span>你像一阵风</span>
+                <span>8评论</span>
+                <span>10分钟前</span>
+                <span class="close">
+                  <van-icon name="cross"></van-icon>
+                </span>
+              </div>
+            </div>
+          </van-cell>
         </van-cell-group>
       </van-list>
     </van-pull-refresh>
@@ -18,7 +37,7 @@ export default {
   name: 'article-list',
   data () {
     return {
-      successText: '',
+      successText: '', // 下拉成功提示
       refreshed: false, // 上拉刷新
       loading: false, // 是否开启上拉加载,默认为false
       finished: false, // 是否完成所有数据加载
@@ -27,9 +46,7 @@ export default {
   },
   methods: {
     onLoad () {
-      // setTimeout(() => {
-      //   this.finished = true
-      // }, 1500)
+      // 上拉加载
       if (this.articles.length > 50) {
         this.finished = true
       } else {
@@ -44,9 +61,12 @@ export default {
       }
     },
     onRefresh () {
-    // 下拉刷新, 读取新数据 ,新数据在articles头部
+      // 下拉刷新, 读取新数据 ,新数据在articles头部
       setTimeout(() => {
-        const arr = Array.from(Array(7), (value, index) => '追加' + (index + 1))
+        const arr = Array.from(
+          Array(7),
+          (value, index) => '追加' + (index + 1)
+        )
         // 加到数组头部
         this.articles.unshift(...arr)
         // 关闭下拉刷新状态
@@ -58,5 +78,45 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+.article_item {
+  h3 {
+    font-weight: normal;
+    line-height: 2;
+  }
+  .img_box {
+    display: flex;
+    justify-content: space-between;
+    .w33 {
+      width: 33%;
+      height: 90px;
+    }
+    .w100 {
+      width: 100%;
+      height: 180px;
+    }
+  }
+  .info_box {
+    color: #999;
+    line-height: 2;
+    position: relative;
+    font-size: 12px;
+    span {
+      padding-right: 10px;
+      &.close {
+        border: 1px solid #ddd;
+        border-radius: 2px;
+        line-height: 15px;
+        height: 12px;
+        width: 16px;
+        text-align: center;
+        padding-right: 0;
+        font-size: 8px;
+        position: absolute;
+        right: 0;
+        top: 7px;
+      }
+    }
+  }
+}
 </style>
