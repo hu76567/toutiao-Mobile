@@ -34,7 +34,9 @@
                 <span>{{item.comm_count}}评论</span>
                 <!-- 使用过滤器 -->
                 <span>{{item.pubdate | relTime}}</span>
-                <span class="close">
+                <!-- ×号的显示应该根据是否登陆来判断 登录时显示 未登录不显示 -->
+                <!-- 被父组件监听是否点击了×  需要传出点击的文章id -->
+                <span class="close" v-if="user.token" @click="$emit('showAction',item.art_id.toString())">
                   <van-icon name="cross"></van-icon>
                 </span>
               </div>
@@ -49,7 +51,12 @@
 <script>
 // 引入获取文章的模块
 import { getArticles } from '@/api/articles'
+// 引入store
+import { mapState } from 'vuex'
 export default {
+  computed: {
+    ...mapState(['user'])
+  },
   name: 'article-list',
   data () {
     return {
