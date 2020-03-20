@@ -1,5 +1,6 @@
 <template>
     <div class='container'>
+       <!-- 放置tabs组件  默认绑定激活页签-->
      <van-tabs v-model="activeIndex">
        <!-- title为显示内容 -->
         <van-tab :title="item.name" v-for="item in channels" :key="item.id">
@@ -15,9 +16,11 @@
        <van-icon name="wap-nav"></van-icon>
      </span>
      <!-- 放置 一个弹层组件 -->
-      <van-popup v-model="showMoreAction" style="width:75%">
-        <!-- 放置反馈组件 监听点击不感兴趣-->
-        <MoreAction @dislike="disLike" />
+      <van-popup v-model="showMoreAction" style="width:80%">
+        <!-- 放置反馈组件 监听点击  不感兴趣\举报公用一个方法-->
+        <!-- type冲突 -->
+        <!-- $event是事件参数 -->
+        <MoreAction @dislike="dislikeOrReport('dislike')" @report="dislikeOrReport('report',$event)" />
       </van-popup>
   </div>
 </template>
@@ -26,7 +29,7 @@
 import ArticleList from './components/article-list'
 import { getmyChannels } from '@/api/channels'
 import MoreAction from './components/more-action'
-import { dislikeArticle } from '@/api/articles'
+import { dislikeArticle, reportArticle } from '@/api/articles'
 import eventbus from '@/utils/eventbus'
 export default {
   name: 'home',
@@ -42,7 +45,7 @@ export default {
     }
   },
   methods: {
-    // 定义一个方法来发请求
+    // 获取频道信息
     async getmyChannels () {
       const data = await getmyChannels() // 这个是请求
       this.channels = data.channels // 赋值给data中
@@ -53,18 +56,19 @@ export default {
       // 把list子组件传过来的id存储起来
       this.articleId = artId
     },
-    async disLike () {
+    // 公用方法  根据传入的类型分别进行操作
+    async dislikeOrReport (operateType, type) {
       // 调用不感兴趣接口
       try {
-        await dislikeArticle({
+        operateType === 'dislike' ? await dislikeArticle({
           target: this.articleId
-        })
+        }) : await reportArticle({ target: this.articleId, type })
         // 触发一个事件,利用事件广播机制通知对应的tab来删除
         // 传入id,负责监听的组件根据id来删除
         // this.channels[this.activeIndex].id 当前激活的频道的id
         // 不光要知道删除的文章list id,还要知道所在的哪个频道
         eventbus.$emit('delArticle', this.articleId, this.channels[this.activeIndex].id)
-        this.showMoreAction = false
+        this.showMoreAction = false // 关闭弹层
         this.$hnotify({
           type: 'success',
           message: '操作成功'
@@ -75,6 +79,7 @@ export default {
         })
       }
     }
+
   },
   created () {
     // 调用刚才的方法来获取频道数据

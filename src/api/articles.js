@@ -12,11 +12,22 @@ export function getArticles (params) {
 }
 
 /**
- * 不感兴趣的文章接口
+ * 不感兴趣文章接口
  */
-export function dislike (data) {
+export function dislikeArticle (data) {
   return request({
     url: '/article/dislikes',
+    method: 'post',
+    data: data
+  })
+}
+
+/**
+ * 举报文章接口
+ */
+export function reportArticle (data) {
+  return request({
+    url: '/article/reports',
     method: 'post',
     data: data
   })

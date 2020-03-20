@@ -161,7 +161,7 @@ export default {
     }
   },
   created () {
-    // 监听父组件不感兴趣删除
+    // 监听父组件删除
     eventbus.$on('delArticle', (artId, channelId) => {
       // 判断一下传过来的频道id是否等于自身的频道
       if (channelId === this.channel_id) {
