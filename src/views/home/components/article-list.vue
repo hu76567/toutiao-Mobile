@@ -18,15 +18,15 @@
             <div class="article_item">
               <h3 class="van-ellipsis">{{item.title}}</h3>
               <!-- 根据封面类型决定是三图 单图 还是 无图 -->
-              <!-- 三图 -->
+              <!-- 三图 懒加载lazy-load -->
               <div class="img_box" v-if="item.cover.type===3">
-                <van-image class="w33" fit="cover" :src="item.cover.images[0]"/>
-                <van-image class="w33" fit="cover" :src="item.cover.images[1]"/>
-                <van-image class="w33" fit="cover" :src="item.cover.images[2]"/>
+                <van-image lazy-load class="w33" fit="cover" :src="item.cover.images[0]"/>
+                <van-image lazy-load class="w33" fit="cover" :src="item.cover.images[1]"/>
+                <van-image lazy-load class="w33" fit="cover" :src="item.cover.images[2]"/>
               </div>
               <!-- 单图 -->
               <div class="img_box" v-if="item.cover.type===1">
-                <van-image class="w100" fit="cover" :src="item.cover.images[0]"/>
+                <van-image lazy-load class="w100" fit="cover" :src="item.cover.images[0]"/>
               </div>
               <!-- 作者信息 -->
               <div class="info_box">

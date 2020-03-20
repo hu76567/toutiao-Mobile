@@ -4,8 +4,8 @@ import router from './router'
 import '@/permission' // 权限拦截模块
 import store from './store'
 // 完整导入vant  后期优化需要按需加载
-// 引用Vant组件
-import Vant from 'vant'
+// 引用Vant组件和lazyload
+import Vant, { Lazyload } from 'vant'
 // 引入样式
 import 'vant/lib/index.less'
 // 注册Vant组件
@@ -19,6 +19,8 @@ import plugin from '@/utils/plugin'
 Vue.use(Vant)
 // 初始化插件 要放在vue.use(vant)之后
 Vue.use(plugin)
+// 注册懒加载组件
+Vue.use(Lazyload)
 
 Vue.config.productionTip = false
 
