@@ -53,6 +53,7 @@
 import { getArticles } from '@/api/articles'
 // 引入store
 import { mapState } from 'vuex'
+import eventbus from '@/utils/eventbus'
 export default {
   computed: {
     ...mapState(['user'])
@@ -158,6 +159,23 @@ export default {
         this.successText = '当前已经是最新了哦'
       }
     }
+  },
+  created () {
+    // 监听父组件不感兴趣删除
+    eventbus.$on('delArticle', (artId, channelId) => {
+      // 判断一下传过来的频道id是否等于自身的频道
+      if (channelId === this.channel_id) {
+        // 说明这个list就是要删除的
+        const index = this.articles.findIndex(item => item.art_id.toString() === artId)
+        if (index > -1) {
+          this.articles.splice(index, 1) // 删除对应下标的数据
+        }
+        if (this.articles.length === 0) {
+          // 此时说明数据删除光了
+          this.onLoad() // 手动触发onLoad事件
+        }
+      }
+    })
   }
 }
 </script>

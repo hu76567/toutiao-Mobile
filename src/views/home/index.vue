@@ -1,6 +1,6 @@
 <template>
     <div class='container'>
-     <van-tabs>
+     <van-tabs v-model="activeIndex">
        <!-- title为显示内容 -->
         <van-tab :title="item.name" v-for="item in channels" :key="item.id">
            <!-- 列表单元格组件 -->
@@ -27,6 +27,7 @@ import ArticleList from './components/article-list'
 import { getmyChannels } from '@/api/channels'
 import MoreAction from './components/more-action'
 import { dislikeArticle } from '@/api/articles'
+import eventbus from '@/utils/eventbus'
 export default {
   name: 'home',
   components: {
@@ -36,7 +37,8 @@ export default {
     return {
       channels: [], // 接收频道数据
       showMoreAction: false, // 控制反馈组件显示隐藏
-      articleId: null // 接收点击的文章id
+      articleId: null, // 接收点击的文章id
+      activeIndex: 0 // 默认激活的页签
     }
   },
   methods: {
@@ -57,6 +59,12 @@ export default {
         await dislikeArticle({
           target: this.articleId
         })
+        // 触发一个事件,利用事件广播机制通知对应的tab来删除
+        // 传入id,负责监听的组件根据id来删除
+        // this.channels[this.activeIndex].id 当前激活的频道的id
+        // 不光要知道删除的文章list id,还要知道所在的哪个频道
+        eventbus.$emit('delArticle', this.articleId, this.channels[this.activeIndex].id)
+        this.showMoreAction = false
         this.$hnotify({
           type: 'success',
           message: '操作成功'
