@@ -35,7 +35,7 @@
                 <!-- 使用过滤器 -->
                 <span>{{item.pubdate | relTime}}</span>
                 <!-- ×号的显示应该根据是否登陆来判断 登录时显示 未登录不显示 -->
-                <!-- 被父组件监听是否点击了×  需要传出点击的文章id -->
+                <!-- 注册点击事件 反馈给父组件  需要传出点击的文章id -->
                 <span class="close" v-if="user.token" @click="$emit('showAction',item.art_id.toString())">
                   <van-icon name="cross"></van-icon>
                 </span>
@@ -55,6 +55,7 @@ import { getArticles } from '@/api/articles'
 import { mapState } from 'vuex'
 import eventbus from '@/utils/eventbus'
 export default {
+  // 将将state中user映射到此处
   computed: {
     ...mapState(['user'])
   },
@@ -70,6 +71,7 @@ export default {
     }
   },
   props: {
+    // 可以约束传入的值
     // key(props 属性名):value(对象 配置)
     channel_id: {
       required: true, // 必填项 ,可以约束必传的值
@@ -161,16 +163,21 @@ export default {
     }
   },
   created () {
-    // 监听父组件删除
-    eventbus.$on('delArticle', (artId, channelId) => {
+    // 监听父组件删除文章事件
+    // 有多少个实例就有多少个监听
+    eventbus.$on('delArticle', (articleId, channelId) => {
       // 判断一下传过来的频道id是否等于自身的频道
+      // channel_id在props由父组件传入
       if (channelId === this.channel_id) {
         // 说明这个list就是要删除的
-        const index = this.articles.findIndex(item => item.art_id.toString() === artId)
+        // 通过id来寻找返回对应数据的下标,赋值给index
+        // findIndex中会return一个下标
+        const index = this.articles.findIndex(item => item.art_id.toString() === articleId)
         if (index > -1) {
           this.articles.splice(index, 1) // 删除对应下标的数据
         }
         if (this.articles.length === 0) {
+          // 一直删除会把数据都删光
           // 此时说明数据删除光了
           this.onLoad() // 手动触发onLoad事件
         }

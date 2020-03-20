@@ -5,8 +5,7 @@
        <!-- title为显示内容 -->
         <van-tab :title="item.name" v-for="item in channels" :key="item.id">
            <!-- 列表单元格组件 -->
-           <!-- 需要将频道id、传递给列表组件  父传子 -->
-           <!-- 监听list子组件触发的showAction事件 -->
+          <!-- 监听子组件中的showAction -->
            <ArticleList @showAction="openAction" :channel_id="item.id"></ArticleList>
           </van-tab>
      </van-tabs>
@@ -15,11 +14,13 @@
         <!-- 放入图标 vant图标 -->
        <van-icon name="wap-nav"></van-icon>
      </span>
-     <!-- 放置 一个弹层组件 -->
+     <!-- 反馈弹层组件 v-model控制弹层组件是否显示,默认为隐藏 -->
       <van-popup v-model="showMoreAction" style="width:80%">
-        <!-- 放置反馈组件 监听点击  不感兴趣\举报公用一个方法-->
-        <!-- type冲突 -->
-        <!-- $event是事件参数 -->
+        <!--不感兴趣\举报公用一个方法-->
+        <!-- 监听more-action中的不感兴趣和举报的自定义事件,调用接口 -->
+        <!-- @事件名="方法名($event)" -->
+        <!-- $event是事件参数 在h5标签中 dom元素的事件参数, 自定义事件中 是自定义事件传出的第一个参数 -->
+        <!-- report的第一个参数item.value 举报的类型 作为type的实参 -->
         <MoreAction @dislike="dislikeOrReport('dislike')" @report="dislikeOrReport('report',$event)" />
       </van-popup>
   </div>
@@ -29,8 +30,8 @@
 import ArticleList from './components/article-list'
 import { getmyChannels } from '@/api/channels'
 import MoreAction from './components/more-action'
-import { dislikeArticle, reportArticle } from '@/api/articles'
-import eventbus from '@/utils/eventbus'
+import { dislikeArticle, reportArticle } from '@/api/articles' // 引入不感兴趣和举报的接口
+import eventbus from '@/utils/eventbus' // 公共事件池
 export default {
   name: 'home',
   components: {
@@ -40,8 +41,8 @@ export default {
     return {
       channels: [], // 接收频道数据
       showMoreAction: false, // 控制反馈组件显示隐藏
-      articleId: null, // 接收点击的文章id
-      activeIndex: 0 // 默认激活的页签
+      articleId: null, // 接收article-list点击的文章id
+      activeIndex: 0 // 当前默认激活的页签
     }
   },
   methods: {
@@ -50,23 +51,25 @@ export default {
       const data = await getmyChannels() // 这个是请求
       this.channels = data.channels // 赋值给data中
     },
+    // openAction()会在article-list组件触发 showAction的时候 触发
     openAction (artId) {
       // 点击了子组件的×,弹出反馈层
       this.showMoreAction = true
       // 把list子组件传过来的id存储起来
-      this.articleId = artId
+      this.articleId = artId // 把article list子组件传过来id存储在data中
     },
-    // 公用方法  根据传入的类型分别进行操作
+    // 公用方法  不感兴趣和举报
     async dislikeOrReport (operateType, type) {
       // 调用不感兴趣接口
       try {
         operateType === 'dislike' ? await dislikeArticle({
           target: this.articleId
         }) : await reportArticle({ target: this.articleId, type })
-        // 触发一个事件,利用事件广播机制通知对应的tab来删除
-        // 传入id,负责监听的组件根据id来删除
+        // 触发一个事件,利用事件广播机制,通知对应的tab来删除
+        // this.articleId //要删除的文章的id
         // this.channels[this.activeIndex].id 当前激活的频道的id
-        // 不光要知道删除的文章list id,还要知道所在的哪个频道
+        // 将文章id和频道id作为事件的参数
+        // 触发delArticle删除的自定义事件
         eventbus.$emit('delArticle', this.articleId, this.channels[this.activeIndex].id)
         this.showMoreAction = false // 关闭弹层
         this.$hnotify({
@@ -82,7 +85,7 @@ export default {
 
   },
   created () {
-    // 调用刚才的方法来获取频道数据
+    // 获取频道数据
     this.getmyChannels()
   }
 }

@@ -3,7 +3,7 @@
     <!-- 单元格组1 -->
     <!-- v-if v-else 前面满足前面显示 后面满足后面显示 -->
     <van-cell-group v-if="!isReport">
-        <!-- 调用不感兴趣的接口 -->
+        <!-- 触发自定义事件,告诉父组件不感兴趣 -->
       <van-cell @click="$emit('dislike')">不感兴趣</van-cell>
       <van-cell is-link @click="isReport=true">反馈垃圾内容</van-cell>
       <van-cell>拉黑作者</van-cell>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-// 引入 常量文件
+// 引入 常量文件 内容是举报中的选项
 import { reports } from '@/api/constants'
 import eventbus from '@/utils/eventbus'
 export default {
@@ -29,7 +29,7 @@ export default {
     }
   },
   created () {
-    // 重置显示状态
+    // 监听父组件删除文章事件,重置显示状态
     eventbus.$on('delArticle', () => { this.isReport = false })
   }
 }
