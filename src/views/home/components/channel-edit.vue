@@ -14,10 +14,10 @@
             <!-- 点击某个频道的时候需要跳转对应频道,子父传值,传频道id或者索引 -->
             <!-- 传id -->
           <!-- <span @click="$emit('selectChannel',item.id)" class="f12">{{item.name}}</span> -->
-          <!-- 传索引 -->
-          <span @click="$emit('selectChannel',index)" class="f12">{{item.name}}</span>
+          <!-- 传索引,让对应激活的频道变色 -->
+          <span @click="$emit('selectChannel',index)" :class="{red:index===activeIndex}" class="f12">{{item.name}}</span>
           <!-- ×号应该在进入编辑状态时显示,退出编辑状态时不显示 -->
-          <van-icon v-if="index!=0&&editing" class="btn" name="cross"></van-icon>
+          <van-icon v-if="index!=0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
@@ -49,6 +49,10 @@ export default {
       required: true, // 必传项 ,必须传递channels
       type: Array, // 表示传入的prop的类型 数组类型
       default: () => [] // 默认值 用空数据 ,返回一个空数组作为默认值
+    },
+    activeIndex: {
+      required: true,
+      type: Number // 制定type是Numberleixing
     }
   },
   methods: {

@@ -29,7 +29,8 @@
         <!-- title 标题 -->
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
         <!-- 把父组件我的频道传递给子组件edit -->
-        <channelEdit @selectChannel="selectChannel" :channels="channels"></channelEdit>
+        <!-- 给子组件传当前激活的频道 -->
+        <channelEdit :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>
@@ -93,8 +94,8 @@ export default {
         })
       }
     },
-    selectChannel (index) {
     //  子组件触发selectchannel时触发本方法
+    selectChannel (index) {
     // 找到id所对应的频道索引
     // 传id  传索引就不用写这行
     // const index = this.channels.findIndex(item => item.id === id)
