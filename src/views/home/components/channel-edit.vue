@@ -17,7 +17,8 @@
           <!-- 传索引,让对应激活的频道变色 -->
           <span @click="$emit('selectChannel',index)" :class="{red:index===activeIndex}" class="f12">{{item.name}}</span>
           <!-- ×号应该在进入编辑状态时显示,退出编辑状态时不显示 -->
-          <van-icon v-if="index!=0 && editing" class="btn" name="cross"></van-icon>
+          <!-- 注册事件,传出id -->
+          <van-icon @click="$emit('delChannel',item.id)" v-if="index!=0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>

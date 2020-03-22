@@ -30,7 +30,7 @@
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
         <!-- 把父组件我的频道传递给子组件edit -->
         <!-- 给子组件传当前激活的频道 -->
-        <channelEdit :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
+        <channelEdit @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>
@@ -39,7 +39,7 @@
 import ArticleList from './components/article-list'
 import MoreAction from './components/more-action'
 import channelEdit from './components/channel-edit'
-import { getmyChannels } from '@/api/channels'
+import { getmyChannels, delChannel } from '@/api/channels'
 import { dislikeArticle, reportArticle } from '@/api/articles' // 引入不感兴趣和举报的接口
 import eventbus from '@/utils/eventbus' // 公共事件池
 
@@ -101,8 +101,26 @@ export default {
     // const index = this.channels.findIndex(item => item.id === id)
       this.activeIndex = index // 把索引给到当前激活的索引
       this.showChannelEdit = false
+    },
+    async delChannel (id) {
+      // 调用api
+      try {
+        await delChannel(id) // 调用删除api的方法
+        // 移除channels中的数据
+        const index = this.channels.findIndex(item => item.id === id)
+        // 根据删除的索引和激活或因的关系
+        if (index <= this.activeIndex) {
+        //  要删除的索引是当前激活之前的或者是等于激活的
+        // 要往前挪一下
+          this.activeIndex = this.activeIndex - 1
+        }
+        if (index > -1) {
+          this.channels.splice(index, 1)
+        }
+      } catch (error) {
+        this.$hnotify({ message: '删除频道失败' })
+      }
     }
-
   },
   created () {
     // 获取频道数据
