@@ -11,7 +11,11 @@
       <van-grid class="van-hairline--left">
           <!-- 第一个推荐不能被编辑 -->
         <van-grid-item v-for="(item,index) in channels" :key="item.id">
-          <span class="f12">{{item.name}}</span>
+            <!-- 点击某个频道的时候需要跳转对应频道,子父传值,传频道id或者索引 -->
+            <!-- 传id -->
+          <!-- <span @click="$emit('selectChannel',item.id)" class="f12">{{item.name}}</span> -->
+          <!-- 传索引 -->
+          <span @click="$emit('selectChannel',index)" class="f12">{{item.name}}</span>
           <!-- ×号应该在进入编辑状态时显示,退出编辑状态时不显示 -->
           <van-icon v-if="index!=0&&editing" class="btn" name="cross"></van-icon>
         </van-grid-item>

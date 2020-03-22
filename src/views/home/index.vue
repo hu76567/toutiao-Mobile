@@ -29,7 +29,7 @@
         <!-- title 标题 -->
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
         <!-- 把父组件我的频道传递给子组件edit -->
-        <channelEdit :channels="channels"></channelEdit>
+        <channelEdit @selectChannel="selectChannel" :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>
@@ -92,6 +92,14 @@ export default {
           message: '操作失败'
         })
       }
+    },
+    selectChannel (index) {
+    //  子组件触发selectchannel时触发本方法
+    // 找到id所对应的频道索引
+    // 传id  传索引就不用写这行
+    // const index = this.channels.findIndex(item => item.id === id)
+      this.activeIndex = index // 把索引给到当前激活的索引
+      this.showChannelEdit = false
     }
 
   },
