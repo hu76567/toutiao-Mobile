@@ -3,13 +3,16 @@
     <!-- 搜索组件一级路由   返回上一个页面-->
     <van-nav-bar left-arrow title="搜索中心" @click-left="$router.back()"></van-nav-bar>
     <!-- 导航 -->
-    <van-search  placeholder="请输入搜索关键词" shape="round" />
-    <van-cell-group class="suggest-box" >
+    <!-- 有输入内容时显示模糊查询,没有时显示搜索记录 -->
+    <van-search v-model.trim="q" placeholder="请输入搜索关键词" shape="round" />
+    <!-- 模糊查询 -->
+    <van-cell-group class="suggest-box" v-if="q" >
       <van-cell icon="search">
         <span>j</span>ava
       </van-cell>
     </van-cell-group>
-    <div class="history-box">
+    <!-- 搜索记录 -->
+    <div class="history-box" v-else>
       <div class="head">
         <span>历史记录</span>
         <van-icon name="delete"></van-icon>
@@ -26,7 +29,12 @@
 
 <script>
 export default {
-  name: 'search'
+  name: 'search',
+  data () {
+    return {
+      q: '' // 关键字数据
+    }
+  }
 }
 </script>
 
