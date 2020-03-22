@@ -49,7 +49,7 @@ export function getAllChannels () {
 }
 
 /**
- * 删除频道
+ * 频道删除功能
  *  需要id
  */
 export function delChannel (id) {
@@ -76,5 +76,19 @@ export function delChannel (id) {
     } else {
       reject(new Error('没有找到对应的频道'))
     }
+  })
+}
+
+/**
+ * 频道添加功能
+ * @params channel 是{id:,name:}
+ */
+export function addChannel (channel) {
+  return new Promise(function (resolve, reject) {
+    const key = store.state.user.token ? CACHE_CHANNEL_V : CACHE_CHANNEL_T
+    const channels = JSON.parse(localStorage.getItem(key)) // 得到缓存中数据
+    channels.push(channel)
+    localStorage.setItem(key, JSON.stringify(channels))
+    resolve() // 执行成功,才会执行promis后面的内容
   })
 }

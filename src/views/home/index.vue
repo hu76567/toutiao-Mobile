@@ -30,7 +30,7 @@
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
         <!-- 把父组件我的频道传递给子组件edit -->
         <!-- 给子组件传当前激活的频道 -->
-        <channelEdit @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
+        <channelEdit @addChannel="addChannel" @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>
@@ -39,7 +39,7 @@
 import ArticleList from './components/article-list'
 import MoreAction from './components/more-action'
 import channelEdit from './components/channel-edit'
-import { getmyChannels, delChannel } from '@/api/channels'
+import { getmyChannels, delChannel, addChannel } from '@/api/channels'
 import { dislikeArticle, reportArticle } from '@/api/articles' // 引入不感兴趣和举报的接口
 import eventbus from '@/utils/eventbus' // 公共事件池
 
@@ -63,12 +63,32 @@ export default {
       const data = await getmyChannels() // 这个是请求
       this.channels = data.channels // 赋值给data中
     },
-    // openAction()会在article-list组件触发 showAction的时候 触发
-    openAction (artId) {
-      // 点击了子组件的×,弹出反馈层
-      this.showMoreAction = true
-      // 把list子组件传过来的id存储起来
-      this.articleId = artId // 把article list子组件传过来id存储在data中
+    async delChannel (id) {
+      // 调用api
+      try {
+        await delChannel(id) // 调用删除api的方法
+        // 移除channels中的数据
+        const index = this.channels.findIndex(item => item.id === id)
+        // 根据删除的索引和激活或因的关系
+        if (index <= this.activeIndex) {
+        //  要删除的索引是当前激活之前的或者是等于激活的
+        // 要往前挪一下
+          this.activeIndex = this.activeIndex - 1
+        }
+        if (index > -1) {
+          this.channels.splice(index, 1)
+        }
+      } catch (error) {
+        this.$hnotify({ type: 'danger', message: '删除频道失败' })
+      }
+    },
+    async addChannel (channel) {
+      try {
+        await addChannel(channel) // 传入参数写入缓存
+        this.channels.push(channel) // 自身加频道
+      } catch (error) {
+        this.$hnotify({ type: 'danger', message: '添加频道失败' })
+      }
     },
     // 公用方法  不感兴趣和举报 delArticle事件在这里哦
     async dislikeOrReport (operateType, type) {
@@ -94,32 +114,22 @@ export default {
         })
       }
     },
+    // openAction()会在article-list组件触发 showAction的时候 触发
+    openAction (artId) {
+      // 点击了子组件的×,弹出反馈层
+      this.showMoreAction = true
+      // 把list子组件传过来的id存储起来
+      this.articleId = artId // 把article list子组件传过来id存储在data中
+    },
     //  子组件触发selectchannel时触发本方法
     selectChannel (index) {
-    // 找到id所对应的频道索引
-    // 传id  传索引就不用写这行
-    // const index = this.channels.findIndex(item => item.id === id)
+      /**
+       * 找到id所对应的频道索引
+       * 传id  传索引就不用写这行
+       * const index = this.channels.findIndex(item => item.id === id)
+       */
       this.activeIndex = index // 把索引给到当前激活的索引
       this.showChannelEdit = false
-    },
-    async delChannel (id) {
-      // 调用api
-      try {
-        await delChannel(id) // 调用删除api的方法
-        // 移除channels中的数据
-        const index = this.channels.findIndex(item => item.id === id)
-        // 根据删除的索引和激活或因的关系
-        if (index <= this.activeIndex) {
-        //  要删除的索引是当前激活之前的或者是等于激活的
-        // 要往前挪一下
-          this.activeIndex = this.activeIndex - 1
-        }
-        if (index > -1) {
-          this.channels.splice(index, 1)
-        }
-      } catch (error) {
-        this.$hnotify({ message: '删除频道失败' })
-      }
     }
   },
   created () {
