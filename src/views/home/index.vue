@@ -28,7 +28,8 @@
         <!-- v-model 控制显示和隐藏 -->
         <!-- title 标题 -->
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
-        <channelEdit></channelEdit>
+        <!-- 把父组件我的频道传递给子组件edit -->
+        <channelEdit :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>

@@ -9,15 +9,17 @@
         <van-button v-else @click="editing=false" size="mini" type="danger" plain>完成</van-button>
       </div>
       <van-grid class="van-hairline--left">
-        <van-grid-item v-for="index in 8" :key="index">
-          <span class="f12">频道{{index}}</span>
-          <van-icon class="btn" name="cross"></van-icon>
+          <!-- 第一个推荐不能被编辑 -->
+        <van-grid-item v-for="(item,index) in channels" :key="item.id">
+          <span class="f12">{{item.name}}</span>
+          <!-- ×号应该在进入编辑状态时显示,退出编辑状态时不显示 -->
+          <van-icon v-if="index!=0&&editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
     <!-- 可选频道 -->
     <div class="channel">
-      <div class="tit">可选频道：</div>
+      <div class="tit">频道推荐：</div>
       <van-grid class="van-hairline--left">
         <van-grid-item v-for="index in 8" :key="index">
           <span class="f12">频道{{index}}</span>
@@ -33,6 +35,13 @@ export default {
   data () {
     return {
       editing: false
+    }
+  },
+  props: {
+    channels: {
+      required: true, // 必传项 ,必须传递channels
+      type: Array, // 表示传入的prop的类型 数组类型
+      default: () => [] // 默认值 用空数据 ,返回一个空数组作为默认值
     }
   }
 }
@@ -55,11 +64,12 @@ export default {
     }
     .btn {
       position: absolute;
-      bottom: 0;
+      top: 0;
       right: 0;
       background: #ddd;
-      font-size: 12px;
+      font-size: 13px;
       color: #fff;
+      border-radius: 50%;
     }
     .f12 {
       font-size: 12px;
