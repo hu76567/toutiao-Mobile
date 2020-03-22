@@ -7,8 +7,10 @@
  */
 import request from '@/utils/request'
 import store from '@/store'
+
 const CACHE_CHANNEL_V = 'toutiao-v' // 登陆用户的key
 const CACHE_CHANNEL_T = 'toutiao-t' // 游客的key
+
 export function getmyChannels () {
   // return request({
   //   url: '/user/channels'
@@ -43,5 +45,36 @@ export function getmyChannels () {
 export function getAllChannels () {
   return request({
     url: '/channels'
+  })
+}
+
+/**
+ * 删除频道
+ *  需要id
+ */
+export function delChannel (id) {
+  return new Promise(function (resolve, reject) {
+    // 有id从缓存中删除对应数据
+    // 根据token来判断是登录还是游客
+    const key = store.state.user.token ? CACHE_CHANNEL_V : CACHE_CHANNEL_T
+    // 将本地缓存中的字符串转化成对象
+    // 第一种
+    // let channels = JSON.parse(localStorage.getItem(key))
+    // // 利用filter删除
+    // channels = channels.filter(item => item.id !== id)
+    // // 重新写入缓存
+    // localStorage.setItem(key, JSON.stringify(channels))
+
+    // 第二种
+    const channels = JSON.parse(localStorage.getItem(key))
+    const index = channels.findIndex(item => item.id === id)
+    if (index > -1) {
+      channels.splice(index, 1)
+      localStorage.setItem(key, JSON.stringify(channels))
+      // 执行成功直接resolve
+      resolve({ message: '删除成功' })
+    } else {
+      reject(new Error('没有找到对应的频道'))
+    }
   })
 }

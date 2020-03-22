@@ -80,7 +80,7 @@ export default {
     }
   },
   methods: {
-    // 上拉加载
+    // 上拉加载,进入时自动执行
     async onLoad () {
       /**
        if (this.articles.length > 50) {

@@ -70,7 +70,7 @@ export default {
       // 把list子组件传过来的id存储起来
       this.articleId = artId // 把article list子组件传过来id存储在data中
     },
-    // 公用方法  不感兴趣和举报
+    // 公用方法  不感兴趣和举报 delArticle事件在这里哦
     async dislikeOrReport (operateType, type) {
       // 调用不感兴趣接口
       try {
