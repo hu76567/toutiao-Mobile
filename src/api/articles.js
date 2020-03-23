@@ -42,3 +42,13 @@ export function getSuggestion (params) {
     params
   })
 }
+
+/**
+ * 搜索文章的方法
+ */
+export function searchArticle (params) {
+  return request({
+    url: '/search',
+    params // 关键词及分页信息
+  })
+}
