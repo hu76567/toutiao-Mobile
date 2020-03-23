@@ -53,30 +53,30 @@ export default {
       // 节流  限制一个函数一定时间内只能执行一次
 
       // 防抖写法
-      // clearTimeout(this.timer)// 清除定时器
-      // this.timer = setTimeout(async () => {
-      //   // 搜索框为空的时候的数据
-      //   if (!this.q) {
-      //     this.suggestList = []
-      //     return
-      //   }
-      //   const res = await getSuggestion({ q: this.q })
-      //   this.suggestList = res.options
-      // }, 500)
+      clearTimeout(this.timer)// 清除定时器
+      this.timer = setTimeout(async () => {
+        // 搜索框为空的时候的数据
+        if (!this.q) {
+          this.suggestList = []
+          return
+        }
+        const res = await getSuggestion({ q: this.q })
+        this.suggestList = res.options
+      }, 1000)
 
       // 节流写法
-      if (!this.timer) {
-        this.timer = setTimeout(async () => {
-          this.timer = null
-          // 搜索框为空的时候的数据
-          if (!this.q) {
-            this.suggestList = []
-            return
-          }
-          const res = await getSuggestion({ q: this.q })
-          this.suggestList = res.options
-        }, 300)
-      }
+      // if (!this.timer) {
+      //   this.timer = setTimeout(async () => {
+      //     this.timer = null
+      //     // 搜索框为空的时候的数据
+      //     if (!this.q) {
+      //       this.suggestList = []
+      //       return
+      //     }
+      //     const res = await getSuggestion({ q: this.q })
+      //     this.suggestList = res.options
+      //   }, 1000)
+      // }
     }
   },
   methods: {
