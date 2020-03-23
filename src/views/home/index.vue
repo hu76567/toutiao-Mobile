@@ -4,15 +4,14 @@
      <van-tabs v-model="activeIndex">
        <!-- title为显示内容 -->
         <van-tab :title="item.name" v-for="item in channels" :key="item.id">
-           <!-- 列表单元格组件 -->
-          <!-- 监听子组件中的showAction -->
+          <!-- 监听artticle-list组件中的×点击事件showAction -->
            <ArticleList @showAction="openAction" :channel_id="item.id"></ArticleList>
         </van-tab>
      </van-tabs>
      <!-- 在tabs下放置图标  编辑频道的图标 -->
-     <!-- 注册点击事件 显示频道编辑 -->
+     <!-- 注册点击事件 显示频道编辑组件 -->
      <span class="bar_btn" @click="showChannelEdit=true">
-        <!-- 放入图标 vant图标 -->
+        <!-- 三条横线 -->
        <van-icon name="wap-nav"></van-icon>
      </span>
       <!-- 反馈弹层组件 v-model控制弹层组件是否显示,默认为隐藏 -->
@@ -22,15 +21,19 @@
         <!-- @事件名="方法名($event)" -->
         <!-- $event是事件参数 在h5标签中 dom元素的事件参数, 自定义事件中 是自定义事件传出的第一个参数 -->
         <!-- report的第一个参数item.value 举报的类型 作为type的实参 -->
-        <MoreAction @dislike="dislikeOrReport('dislike')" @report="dislikeOrReport('report',$event)" />
+        <MoreAction @dislike="dislikeOrReport('dislike')"
+         @report="dislikeOrReport('report',$event)" />
       </van-popup>
-        <!-- 频道编辑 -->
-        <!-- v-model 控制显示和隐藏 -->
-        <!-- title 标题 -->
+        <!-- 频道编辑 v-model 控制显示和隐藏 title 标题 round关闭圆角 -->
       <van-action-sheet :round="false" v-model="showChannelEdit" title="频道编辑">
-        <!-- 把父组件我的频道传递给子组件edit -->
+        <!-- channels把我的频道的数据传递给edit子组件 -->
+        <!-- activeIndex把当前正激活的频道索引传递给edit子组件 -->
+        <!-- selectChannel监听edit的选择点击跳转事件selectChannel -->
         <!-- 给子组件传当前激活的频道 -->
-        <channelEdit @addChannel="addChannel" @delChannel="delChannel" :activeIndex="activeIndex" @selectChannel="selectChannel" :channels="channels"></channelEdit>
+        <channelEdit
+         @addChannel="addChannel" @delChannel="delChannel"
+         :activeIndex="activeIndex" @selectChannel="selectChannel"
+         :channels="channels"></channelEdit>
       </van-action-sheet>
   </div>
 </template>
@@ -58,16 +61,17 @@ export default {
     }
   },
   methods: {
-    // 获取频道信息
+    // 获取我的频道信息
+    // 先从本地拉,拉不到就去线上拉
     async getmyChannels () {
-      const data = await getmyChannels() // 这个是请求
-      this.channels = data.channels // 赋值给data中
+      const res = await getmyChannels() // 请求
+      this.channels = res.channels // 赋值给data中
     },
     async delChannel (id) {
       // 调用api
       try {
         await delChannel(id) // 调用删除api的方法
-        // 移除channels中的数据
+        // 移除data中channels中的数据
         const index = this.channels.findIndex(item => item.id === id)
         // 根据删除的索引和激活或因的关系
         if (index <= this.activeIndex) {
@@ -75,9 +79,7 @@ export default {
         // 要往前挪一下
           this.activeIndex = this.activeIndex - 1
         }
-        if (index > -1) {
-          this.channels.splice(index, 1)
-        }
+        this.channels.splice(index, 1)
       } catch (error) {
         this.$hnotify({ type: 'danger', message: '删除频道失败' })
       }
@@ -121,7 +123,7 @@ export default {
       // 把list子组件传过来的id存储起来
       this.articleId = artId // 把article list子组件传过来id存储在data中
     },
-    //  子组件触发selectchannel时触发本方法
+    // 跳到对应频道 ,关闭频道编辑弹层
     selectChannel (index) {
       /**
        * 找到id所对应的频道索引

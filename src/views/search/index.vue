@@ -13,14 +13,15 @@
     </van-cell-group>
     <!-- 搜索记录 -->
     <div class="history-box" v-else>
-      <div class="head">
+      <div class="head" v-if="historyList.length">
         <span>历史记录</span>
         <van-icon name="delete"></van-icon>
       </div>
       <van-cell-group>
-        <van-cell>
-          <a class="word_btn">电脑</a>
-          <van-icon class="close_btn" slot="right-icon" name="cross" />
+        <van-cell v-for="(item,index) in historyList" :key="index">
+          <a class="word_btn">{{item}}</a>
+          <!-- 注册×的点击事件 删除历史记录 -->
+          <van-icon @click="delHistory(index)" class="close_btn" slot="right-icon" name="cross" />
         </van-cell>
       </van-cell-group>
     </div>
@@ -28,12 +29,27 @@
 </template>
 
 <script>
+const key = 'toutiao-h' // 用来读取本地缓存中的历史记录
 export default {
   name: 'search',
   data () {
     return {
-      q: '' // 关键字数据
+      q: '', // 关键字数据
+      historyList: [] // 历史记录数据  数组
     }
+  },
+  methods: {
+    // 删除历史记录
+    delHistory (index) {
+    // 先在data中删除 然后同步到本地缓存
+      this.historyList.splice(index, 1)
+      localStorage.setItem(key, JSON.stringify(this.historyList))
+    }
+  },
+  created () {
+  // 实例初始化之后
+  // 或者是直接写在historyList
+    this.historyList = JSON.parse(localStorage.getItem(key) || '[]')
   }
 }
 </script>

@@ -11,19 +11,21 @@
       <van-grid class="van-hairline--left">
           <!-- 第一个推荐不能被编辑 -->
         <van-grid-item v-for="(item,index) in channels" :key="item.id">
-            <!-- 点击某个频道的时候需要跳转对应频道,子父传值,传频道id或者索引 -->
-            <!-- 传id -->
+          <!-- 点击某个频道的时候需要跳转对应频道,子父传值,传频道id或者索引 -->
+          <!-- 传id -->
           <!-- <span @click="$emit('selectChannel',item.id)" class="f12">{{item.name}}</span> -->
-          <!-- 传索引,让对应激活的频道变色 -->
+          <!-- 比对索引,给当前频道 加一个激活样式 -->
+          <!-- 传索引 -->
           <span @click="$emit('selectChannel',index)" :class="{red:index===activeIndex}" class="f12">{{item.name}}</span>
+
           <!-- ×号应该在进入编辑状态时显示,退出编辑状态时不显示 -->
-          <!-- 注册事件,传出id -->
+          <!-- 第一个永远不显示× -->
+          <!-- 注册点击事件告诉父组件要删除,传出id -->
           <van-icon @click="$emit('delChannel',item.id)" v-if="index!=0 && editing" class="btn" name="cross"></van-icon>
         </van-grid-item>
       </van-grid>
     </div>
     <!-- 推荐频道 -->
-    <!-- 推荐频道=所有频道 - 我的频道 -->
     <div class="channel">
       <div class="tit">频道推荐：</div>
       <van-grid class="van-hairline--left">
@@ -43,9 +45,10 @@ export default {
   data () {
     return {
       editing: false,
-      allChannels: [] // 接收所有的频道数据
+      allChannels: [] // 所有的频道数据
     }
   },
+  // 接收父组件传过来的channels和activeIndex
   props: {
     channels: {
       required: true, // 必传项 ,必须传递channels
@@ -58,17 +61,19 @@ export default {
     }
   },
   methods: {
+    // 获取所有频道
     async getAllChannels () {
       const res = await getAllChannels()
       this.allChannels = res.channels // 返回值给到数据中的allChannels
     }
   },
   computed: {
-    // 用计算属性来处理  推荐频道和我的频道的关系
+    // 用过滤器来处理  推荐频道和我的频道的关系
     optionalChannels () {
       // 全部频道减去我的频道就是推荐频道
       // this.allChannels.filter(item=>!this.channels.some(o=>o.id===item.id))
       return this.allChannels.filter(item => !this.channels.some(o => o.id === item.id))
+      // 过滤出在allChannels这个大数组中与我的频道不同项
     }
 
   },
