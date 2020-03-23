@@ -4,6 +4,7 @@
        <!-- 实现上拉加载 -->
       <van-list v-model="loading" @load="onLoad" :finished="finished">
         <van-cell-group>
+          <!-- 注册点击事件跳转详情页 -->
           <van-cell v-for="item in articles" :key="item.art_id.toString()">
             <div class="article_item">
               <h3 class="van-ellipsis">{{item.title}}</h3>
@@ -45,16 +46,19 @@ export default {
   methods: {
     // 方法会在滚动条滚动到底部的时候执行
     async onLoad () {
-      // 调用接口
-      const { q } = this.$route.query
+      // 解构路由参数
+      const { q } = this.$route.query // 搜索页面传过来的值
+      // 发送请求
       const res = await Articles.searchArticle({ ...this.page, q: q })
-      this.articles.push(...res.results) // 将数据追加到队尾
-      this.loading = false // 关闭上拉加载状态
+      // 将返回的结果追加到articles队尾
+      this.articles.push(...res.results)
+      // 关闭上拉加载状态
+      this.loading = false
       if (res.results.length) {
-        // 有下一页数据,翻页
+        // 返回的查询记录有值,表示还有数据未加载完成
         this.page.page++
       } else {
-        // 没有下一页
+        // 表示全部数据加载完成
         this.finished = true
       }
     }

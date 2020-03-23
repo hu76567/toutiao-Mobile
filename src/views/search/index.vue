@@ -11,7 +11,7 @@
         {{item}}
       </van-cell>
     </van-cell-group>
-    <!-- 搜索记录 -->
+    <!-- 搜索记录 有数据才显示记录模块 -->
     <div class="history-box" v-else>
       <div class="head" v-if="historyList.length">
         <span>历史记录</span>
@@ -41,7 +41,7 @@ export default {
     return {
       q: '', // 关键字数据
       historyList: [], // 历史记录数据  数组
-      suggestList: []
+      suggestList: [] // 存储联想搜索的数据
     }
   },
   watch: {
@@ -53,18 +53,20 @@ export default {
       // 节流  限制一个函数一定时间内只能执行一次
 
       // 防抖写法
+      // 1.5秒内输入框内容改变,不发送请求,超过1.5未改变发送一次
       clearTimeout(this.timer)// 清除定时器
       this.timer = setTimeout(async () => {
-        // 搜索框为空的时候的数据
         if (!this.q) {
+          // 如果没有搜索关键字直接返回,联想的内容清空
           this.suggestList = []
           return
         }
         const res = await getSuggestion({ q: this.q })
         this.suggestList = res.options
-      }, 1000)
+      }, 1500)
 
       // 节流写法
+      // 每隔1.5秒发送一次请求
       // if (!this.timer) {
       //   this.timer = setTimeout(async () => {
       //     this.timer = null
@@ -75,23 +77,26 @@ export default {
       //     }
       //     const res = await getSuggestion({ q: this.q })
       //     this.suggestList = res.options
-      //   }, 1000)
+      //   }, 1500)
       // }
     }
   },
   methods: {
-    // 删除历史记录
+    // 删除单条历史记录
     // 先在data中删除 然后同步到本地缓存
     delHistory (index) {
       this.historyList.splice(index, 1)
       localStorage.setItem(key, JSON.stringify(this.historyList))
     },
+    // 清空所有历史记录
+    // 支持promise
     async clear () {
       try {
         await this.$dialog.confirm({
           title: '提示',
           message: '确定要删除所有历史记录么'
         })
+        // 点击确定后执行
         this.historyList = [] // 历史记录置空
         localStorage.setItem('key', '[]') // 本地记录置空
       } catch (error) {
@@ -105,11 +110,10 @@ export default {
       if (!this.q) return
       // 加到历史记录
       this.historyList.push(this.q)
-      // 去重
-      // 转成数组
+      // 去重并转成数组
       this.historyList = Array.from(new Set(this.historyList))
-      // 记录存到本地
-      localStorage.setItem(key.JSON.stringify(this.historyList))
+      // 设置本地缓存
+      localStorage.setItem(key, JSON.stringify(this.historyList))
       this.$router.push({ path: '/search/result', query: { q: this.q } })
     },
     // 历史记录和联想内容共用一个跳转
@@ -117,6 +121,7 @@ export default {
       this.historyList.push(text)
       this.historyList = Array.from(new Set(this.historyList))
       localStorage.setItem(key, JSON.stringify(this.historyList))
+      // 跳到搜索结果页
       this.$router.push({ path: '/search/result', query: { q: text } })
     }
     // toSearchResult (text) {
@@ -125,7 +130,7 @@ export default {
     //   this.$router.push({ path: '/search/result', query: { q: text } })
     // }
   },
-  // 实例初始化之后
+  // 实例初始化之后从缓存中读取数据
   // 或者是直接写在historyList
   created () {
     this.historyList = JSON.parse(localStorage.getItem(key) || '[]')
