@@ -7,8 +7,8 @@
     <van-search @search="onSearch" v-model.trim="q" placeholder="请输入搜索关键词" shape="round" />
     <!-- 模糊查询 -->
     <van-cell-group class="suggest-box" v-if="q" >
-      <van-cell icon="search">
-        <span>j</span>ava
+      <van-cell @click="toResult(item)" icon="search" v-for="(item,index) in suggestList" :key="index">
+        {{item}}
       </van-cell>
     </van-cell-group>
     <!-- 搜索记录 -->
@@ -33,13 +33,50 @@
 </template>
 
 <script>
+import { getSuggestion } from '@/api/articles'
 const key = 'toutiao-h' // 用来读取本地缓存中的历史记录
 export default {
   name: 'search',
   data () {
     return {
       q: '', // 关键字数据
-      historyList: [] // 历史记录数据  数组
+      historyList: [], // 历史记录数据  数组
+      suggestList: []
+    }
+  },
+  watch: {
+    // 监听关键字q的变化
+    q () {
+      // 变化的时候去请求联想词条
+      // 不能每变化一次就去请求一次
+      // 防抖  触发事件后n秒内只执行一次,n秒内又触发事件,则重新计算执行时间
+      // 节流  限制一个函数一定时间内只能执行一次
+
+      // 防抖写法
+      // clearTimeout(this.timer)// 清除定时器
+      // this.timer = setTimeout(async () => {
+      //   // 搜索框为空的时候的数据
+      //   if (!this.q) {
+      //     this.suggestList = []
+      //     return
+      //   }
+      //   const res = await getSuggestion({ q: this.q })
+      //   this.suggestList = res.options
+      // }, 500)
+
+      // 节流写法
+      if (!this.timer) {
+        this.timer = setTimeout(async () => {
+          this.timer = null
+          // 搜索框为空的时候的数据
+          if (!this.q) {
+            this.suggestList = []
+            return
+          }
+          const res = await getSuggestion({ q: this.q })
+          this.suggestList = res.options
+        }, 300)
+      }
     }
   },
   methods: {
@@ -48,11 +85,6 @@ export default {
     delHistory (index) {
       this.historyList.splice(index, 1)
       localStorage.setItem(key, JSON.stringify(this.historyList))
-    },
-    toResult (text) {
-      // 传参给结果界面 params/query
-      // this.$router.push(`/search/result?q=${text}`)
-      this.$router.push({ path: '/search/result', query: { q: text } })
     },
     async clear () {
       try {
@@ -79,7 +111,19 @@ export default {
       // 记录存到本地
       localStorage.setItem(key.JSON.stringify(this.historyList))
       this.$router.push({ path: '/search/result', query: { q: this.q } })
+    },
+    // 历史记录和联想内容共用一个跳转
+    toResult (text) {
+      this.historyList.push(text)
+      this.historyList = Array.from(new Set(this.historyList))
+      localStorage.setItem(key, JSON.stringify(this.historyList))
+      this.$router.push({ path: '/search/result', query: { q: text } })
     }
+    // toSearchResult (text) {
+    //   // 传参给结果界面 params/query
+    //   // this.$router.push(`/search/result?q=${text}`)
+    //   this.$router.push({ path: '/search/result', query: { q: text } })
+    // }
   },
   // 实例初始化之后
   // 或者是直接写在historyList
