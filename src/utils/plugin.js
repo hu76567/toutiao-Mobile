@@ -15,7 +15,7 @@ export default {
   // 该方法会在vue.use()时调用
   install (Vue) {
     // 这里借用了vant的$notify方法
-    Vue.prototype.$hnotify = (params) => Vue.prototype.$notify({ duration: 1000, ...params })
+    Vue.prototype.$hnotify = (params) => Vue.prototype.$notify({ duration: 1500, ...params })
     // params是后面的参数,接收的是message
     // 还是用notify  只是把notify的时间改变了
     // $hnotify可以像notify一样调用
