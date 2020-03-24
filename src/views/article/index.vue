@@ -16,6 +16,7 @@
       </div>
       <div class="zan">
         <!-- 根据态度来判断是点赞还是不喜欢 -->
+        <!-- :class="{css名称: 布尔值}" -->
         <van-button round size="small" :class="{active:article.attitude===1}" plain icon="like-o">点赞</van-button>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <van-button round size="small" :class="{active:article.attitude===0}" plain icon="delete">不喜欢</van-button>
