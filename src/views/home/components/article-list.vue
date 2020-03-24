@@ -14,7 +14,8 @@
       <van-list finished-text="亲,没有数据了哦" @load="onLoad" :finished="finished" v-model="loading">
         <van-cell-group>
           <!-- item.art_id 此时是一个大数字的对象 v-for 的key需要用字符串或者数字代理 -->
-          <van-cell v-for="item in articles" :key="item.art_id.toString()">
+          <!-- 跳转详情并传参 -->
+          <van-cell :to="`/article?artId=${item.art_id.toString()}`" v-for="item in articles" :key="item.art_id.toString()">
             <div class="article_item">
               <h3 class="van-ellipsis">{{item.title}}</h3>
               <!-- 根据封面类型决定是三图 单图 还是 无图 -->
@@ -36,7 +37,8 @@
                 <span>{{item.pubdate | relTime}}</span>
                 <!-- ×号的显示应该根据是否登陆来判断 登录时显示 未登录不显示 -->
                 <!-- 注册点击事件 反馈给父组件  需要传出点击的文章id -->
-                <span class="close" v-if="user.token" @click="$emit('showAction',item.art_id.toString())">
+                <!-- 跳转详情页会出现冒泡,需要加stop修饰符 -->
+                <span class="close" v-if="user.token" @click.stop="$emit('showAction',item.art_id.toString())">
                   <van-icon name="cross"></van-icon>
                 </span>
               </div>

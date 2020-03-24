@@ -4,8 +4,8 @@
        <!-- 实现上拉加载 -->
       <van-list v-model="loading" @load="onLoad" :finished="finished">
         <van-cell-group>
-          <!-- 注册点击事件跳转详情页 -->
-          <van-cell v-for="item in articles" :key="item.art_id.toString()">
+          <!-- 注册点击事件跳转详情页 artId传参 -->
+          <van-cell :to="`/article?artId=${item.art_id.toString()}`" v-for="item in articles" :key="item.art_id.toString()">
             <div class="article_item">
               <h3 class="van-ellipsis">{{item.title}}</h3>
               <div class="img_box" v-if="item.cover.type===3">
