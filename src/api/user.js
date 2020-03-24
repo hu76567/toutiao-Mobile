@@ -11,3 +11,28 @@ export function login (data) {
     data: data // 接收传入的data
   })
 }
+
+/**
+ * 关注用户
+ */
+
+export function followUser (data) {
+  return request({
+    url: '/user/followings',
+    method: 'post',
+    // body data
+    // query params
+    data
+  })
+}
+
+/**
+  * 取消关注
+  */
+
+export function unFollowUser (autid) {
+  return request({
+    url: `/user/followings/${autid}`,
+    method: 'delete'
+  })
+}

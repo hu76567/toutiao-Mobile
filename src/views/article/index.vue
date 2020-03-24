@@ -9,10 +9,10 @@
           <p class="name">{{article.aut_name}}</p>
           <p class="time">{{article.pubdate|relTime}}</p>
         </div>
-        <van-button round size="small" type="info">{{ article.is_followed ? '已关注' : '+ 关注' }}</van-button>
+        <van-button :loading="followLoading" @click="follow()" round size="small" type="info">{{ article.is_followed ? '已关注' : '+ 关注' }}</van-button>
       </div>
       <div class="content" v-html="article.content">
-        <!-- 有属性有样式 -->
+        <!-- 有属性有样式  需要渲染html样式 -->
       </div>
       <div class="zan">
         <!-- 根据态度来判断是点赞还是不喜欢 -->
@@ -21,22 +21,54 @@
         <van-button round size="small" :class="{active:article.attitude===0}" plain icon="delete">不喜欢</van-button>
       </div>
     </div>
+    <!-- 遮罩层 -->
+    <van-overlay :show="overLoading">
+      <div class="overloading">
+          <van-loading></van-loading>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
 <script>
 import { getArticleInfo } from '@/api/articles'
+import { followUser, unFollowUser } from '@/api/user'
 export default {
   data () {
     return {
-      article: {} // 接收文章详情数据
+      article: {}, // 接收文章详情数据
+      followLoading: false, // 是否正在点击关注
+      overLoading: false // 遮罩层状态
     }
   },
   methods: {
     // 获取文章详情数据
     async getArticleInfo () {
+      this.overLoading = true
       const { artId } = this.$route.query // 从路由对象中读取参数
       this.article = await getArticleInfo(artId)
+      this.overLoading = false
+    },
+    // 关注/取消关注
+    async follow () {
+      this.followLoading = true
+      try {
+        //  当前是关注就取消关注,未关注就关注
+        if (this.article.is_followed) {
+        // 取消
+          await unFollowUser(this.article.aut_id)
+        } else {
+          // 关注
+          await followUser({ target: this.article.aut_id })
+        }
+        this.article.is_followed = !this.article.is_followed
+      } catch (error) {
+        this.$hnotify({ type: 'danger', message: '操作失败' })
+      } finally {
+        // 不论执行的是成功的还是失败的try or catch 都会进入finally
+        // 关闭加载状态
+        this.followLoading = false
+      }
     }
   },
   created () {
@@ -46,6 +78,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.van-overlay{
+background: none;
+}
+.overloading{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .container {
   height: 100%;
   overflow-y: auto;
