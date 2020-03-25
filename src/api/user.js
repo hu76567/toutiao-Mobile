@@ -45,3 +45,13 @@ export function getUserInfo () {
     url: '/user'
   })
 }
+
+/**
+ * 获取用户资料
+ */
+
+export function getUserProfile () {
+  return request({
+    url: '/user/profile'
+  })
+}

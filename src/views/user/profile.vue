@@ -13,8 +13,8 @@
         />
       </van-cell>
       <van-cell is-link @click="showName=true" title="昵称" :value="user.name" />
-      <van-cell is-link title="性别" value='男'/>
-      <van-cell is-link title="生日" value="2019-08-08" />
+      <van-cell is-link @click="showGender=true" title="性别" :value="user.gender ===0 ? '男':'女'"/>
+      <van-cell is-link @click="showDate" title="生日" :value="user.birthday" />
     </van-cell-group>
 
     <!-- 头像弹层 -->
@@ -36,6 +36,7 @@
 
     <!-- 性别弹层 -->
     <van-action-sheet
+    @select="selectItem"
     :actions="actions"
     v-model="showGender"
     cancel-text="取消"></van-action-sheet>
@@ -49,12 +50,16 @@
           type="date"
           :min-date="minDate"
           :max-date="maxDate"
+          @confirm="confirmDate"
+          @cancel="showBirthDay=false"
          />
     </van-popup>
   </div>
 </template>
 
 <script>
+import dayjs from 'dayjs'
+import { getUserProfile } from '@/api/user'
 export default {
   name: 'profile',
   data () {
@@ -69,14 +74,17 @@ export default {
       maxDate: new Date(), // 生日最大时间 永远是小于等于当前时间的
       user: {
         name: '', // 昵称
-        gender: 1, // 性别默认值
-        birthday: '', // 生日
+        gender: 0, // 性别默认值
+        birthday: '2002-02-20', // 生日
         photo: ''// 头像
       },
       nameMsg: '' // 错误信息
     }
   },
   methods: {
+    async getUserProfile () {
+      this.user = await getUserProfile()
+    },
     btnName () {
       if (this.user.name.length < 1 || this.user.name.length > 7) {
         //  如果内容长度 小于1 或者大于7 表示 这个昵称不符合要求
@@ -86,7 +94,28 @@ export default {
       // 如果满足的话 就会继续执行
       this.nameMsg = '' // 先把提示消息清空
       this.showName = false // 关闭弹层
+    },
+    selectItem (item, index) {
+      //  通过item或者索引知道点击的是男还是女
+      // 0男   1女
+      this.user.gender = index
+      this.showGender = false
+    },
+    showDate () {
+      // 显示生日弹层
+      this.showBirthDay = true
+      // 将生日的字符串转化成对象绑定到日期组件上
+      this.currentDate = new Date(this.user.birthday)
+    },
+    confirmDate () {
+      // 确定生日日期
+      // 需要把date转成字符串
+      this.user.birthday = dayjs(this.currentDate).format('YYYY-MM-DD')
+      this.showBirthDay = false // 关闭弹层
     }
+  },
+  created () {
+    this.getUserProfile()
   }
 }
 </script>
