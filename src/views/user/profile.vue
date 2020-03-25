@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <van-nav-bar left-arrow @click-left="$router.back()" title="编辑资料" right-text="保存" ></van-nav-bar>
+    <van-nav-bar left-arrow @click-left="$router.back()" title="编辑资料" @click-right="saveInfo" right-text="保存" ></van-nav-bar>
     <van-cell-group>
-      <van-cell is-link title="头像"  center>
+      <van-cell @click="showPhoto=true" is-link title="头像"  center>
         <van-image
           slot="default"
           width="1.5rem"
@@ -21,7 +21,7 @@
     <van-popup  v-model="showPhoto" style="width:80%">
       <!-- 1 本地相册选择图片 -->
       <!-- 2 拍照 -->
-      <van-cell is-link title="本地相册选择图片"></van-cell>
+      <van-cell @click="openFile" is-link title="本地相册选择图片"></van-cell>
       <van-cell is-link title="拍照"></van-cell>
     </van-popup>
 
@@ -54,12 +54,14 @@
           @cancel="showBirthDay=false"
          />
     </van-popup>
+    <!-- 放置一个input:file不能让人看见 -->
+    <input @change="upLoad" ref="myFile" type="file" style="display:none">
   </div>
 </template>
 
 <script>
 import dayjs from 'dayjs'
-import { getUserProfile } from '@/api/user'
+import { getUserProfile, updatePhoto, saveUserInfo } from '@/api/user'
 export default {
   name: 'profile',
   data () {
@@ -82,6 +84,27 @@ export default {
     }
   },
   methods: {
+    async saveInfo () {
+      try {
+        // 保存信息
+        await saveUserInfo(this.user)
+        this.$hnotify({ type: 'success', message: '保存成功' })
+      } catch (error) {
+        this.$hnotify({ message: '保存失败' })
+      }
+    },
+    async upLoad (params) {
+      // 选择完头像后上传
+      const data = new FormData()
+      data.append('pthoto', this.$refs.myFile.files[0]) // 第二个参数选择的文件
+      const res = await updatePhoto(data) // 上传头像
+      this.user.photo = res.photo // 更新头像
+      this.showPhoto = false // 关闭弹层
+    },
+    openFile () {
+      // 触发点击input的动作
+      this.$refs.myFile.click()
+    },
     async getUserProfile () {
       this.user = await getUserProfile()
     },
