@@ -74,6 +74,6 @@ export function saveUserInfo (data) {
   return request({
     url: '/user/profile',
     method: 'patch',
-    data: { ...data, pthoto: null } // 直接将photo设置为空
+    data: { ...data, photo: null } // 直接将photo设置为空
   })
 }

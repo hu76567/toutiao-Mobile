@@ -21,8 +21,9 @@
     <van-popup  v-model="showPhoto" style="width:80%">
       <!-- 1 本地相册选择图片 -->
       <!-- 2 拍照 -->
-      <van-cell @click="openFile" is-link title="本地相册选择图片"></van-cell>
-      <van-cell is-link title="拍照"></van-cell>
+      <van-image contain :src="user.photo"></van-image>
+      <van-button block type="info" @click="openFile" is-link title="本地相册">相册</van-button>
+      <van-button block type="primary" is-link title="拍照">拍照</van-button>
     </van-popup>
 
     <!-- 昵称弹层 -->
@@ -55,7 +56,7 @@
          />
     </van-popup>
     <!-- 放置一个input:file不能让人看见 -->
-    <input @change="upLoad" ref="myFile" type="file" style="display:none">
+    <input @change="upLoad()" ref="myFile" type="file" style="display:none">
   </div>
 </template>
 
@@ -93,10 +94,10 @@ export default {
         this.$hnotify({ message: '保存失败' })
       }
     },
-    async upLoad (params) {
+    async upLoad () {
       // 选择完头像后上传
       const data = new FormData()
-      data.append('pthoto', this.$refs.myFile.files[0]) // 第二个参数选择的文件
+      data.append('photo', this.$refs.myFile.files[0]) // 第二个参数选择的文件
       const res = await updatePhoto(data) // 上传头像
       this.user.photo = res.photo // 更新头像
       this.showPhoto = false // 关闭弹层
