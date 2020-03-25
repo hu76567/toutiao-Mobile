@@ -72,3 +72,16 @@ export function getComments (params) {
     params
   })
 }
+
+/**
+ * 评论或回复评论的方法
+ * 要支持两种场景 回复文章评论  评论的评论
+ */
+
+export function commentOrReply (data) {
+  return request({
+    url: '/comments', // 请求地址
+    method: 'post', // 请求类型不同
+    data
+  })
+}

@@ -28,7 +28,7 @@ export default {
     return {
       // 定义表单数据 然后跟视图绑定
       loginForm: {
-        mobile: '13911111111', // 手机号
+        mobile: '18741770421', // 手机号
         code: '246810' // 验证码
       },
       errorMseeage: {

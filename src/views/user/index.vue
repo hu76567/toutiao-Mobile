@@ -1,25 +1,26 @@
 <template>
-  <div>
+<div class="container">
+   <div>
         <div class="user-profile">
       <div class="info">
-        <van-image round src="https://img.yzcdn.cn/vant/cat.jpeg" />
+        <van-image round :src="userInfo.photo" />
         <h3 class="name">
-          用户名
+         {{userInfo.name}}
           <br />
           <van-tag size="mini">申请认证</van-tag>
         </h3>
       </div>
       <van-row>
         <van-col span="8">
-          <p>0</p>
+          <p>{{userInfo.art_count}}</p>
           <p>动态</p>
         </van-col>
         <van-col span="8">
-          <p>0</p>
+          <p>{{userInfo.follow_count}}</p>
           <p>关注</p>
         </van-col>
         <van-col span="8">
-          <p>0</p>
+          <p>{{userInfo.fans_count}}</p>
           <p>粉丝</p>
         </van-col>
       </van-row>
@@ -40,14 +41,47 @@
       <van-cell icon="edit" title="编辑资料" to="/user/profile" is-link />
       <van-cell icon="chat-o" title="小智同学" to="/user/chat" is-link />
       <van-cell icon="setting-o" title="系统设置" is-link />
-      <van-cell icon="warning-o" title="退出登录" to="/login" is-link />
+      <van-cell icon="warning-o" title="退出登录" @click="logout" is-link />
     </van-cell-group>
   </div>
+</div>
+
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+import { getUserInfo } from '@/api/user'
 export default {
-  name: 'user'
+  name: 'user',
+  data () {
+    return {
+      userInfo: {}
+    }
+  },
+  methods: {
+    // 将vuex中的方法映射过来
+    ...mapMutations(['delUser']),
+    // 获取用户个人信息
+    async getUserInfo () {
+      this.userInfo = await getUserInfo()
+    },
+    // 用户退出登录
+    async logout () {
+      try {
+        await this.$dialog.confirm({
+          title: '提示',
+          message: '确定要退出登录吗'
+        })
+        this.delUser() // 清除token
+        this.$router.push('/login') // 跳转登录页面
+      } catch (error) {
+
+      }
+    }
+  },
+  created () {
+    this.getUserInfo() // 调用方法
+  }
 }
 </script>
 

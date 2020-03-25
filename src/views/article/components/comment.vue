@@ -26,16 +26,19 @@
       </div>
     </van-list>
 
-    <!-- 底部输入框 -->
+    <!-- 底部输入框 评论和回复用的是同一个输入框 -->
     <div class="reply-container van-hairline--top">
       <van-field v-model="value" placeholder="写评论...">
         <van-loading v-if="submiting" slot="button" type="spinner" size="16px"></van-loading>
-        <span class="submit" v-else slot="button">提交</span>
+        <!-- 点击了提交先把按钮隐藏放置重复提交 -->
+        <!-- 否则会造成两次提交 -->
+        <span class="submit" @click="submit()" v-else slot="button">发布</span>
       </van-field>
     </div>
     <!-- 评论的评论弹出面板 -->
     <!-- immediate-check关闭load主动上拉加载 -->
-     <van-action-sheet v-model="showReply" :round="false" class="reply_dialog" title="回复评论">
+    <!-- 关闭面板的时候将评论id设置为空 -->
+     <van-action-sheet @close="reply.commentId=null" v-model="showReply" :round="false" class="reply_dialog" title="回复评论">
       <van-list @load="getReply"
       :immediate-check="false"
        v-model="reply.loading"
@@ -83,6 +86,66 @@ export default {
     }
   },
   methods: {
+    // 发布评论
+    async submit () {
+    // 先判断是否登陆了
+      if (this.$store.state.user.token) {
+        //  此时才认为你登录了
+        // 是否输入了评论内容
+        if (!this.value) return false
+        // 如果有内容
+        this.submiting = true // 打开提交状态 提交完毕后才关掉状态
+        // 调接口
+        // 休眠函数 控制提交频率
+        await this.$sleep()
+        try {
+          const res = await articles.commentOrReply({
+          // 调用提交方法
+          // 参数
+            content: this.value,
+            // 要么是文章ID要么是评论id
+            target: this.reply.commentId ? this.reply.commentId : this.$route.query.artId,
+            // 对评论回复 要传评论属于那个文章 ,对文章评论不用传
+            art_id: this.reply.commentId ? this.$route.query.artId : null
+          })
+          // 希望调用完成之后,平路直接显示在评论列表上
+          //   res.new_obj是返回的添加成功的数据
+          if (this.reply.commentId) {
+            // 对评论进行评论
+            // 将数据添加到评论的评论
+            this.reply.list.unshift(res.new_obj)
+            // 对评论进行评论需要找到对应的评论id,将回复数加1
+            // 比较评论id 和 回复的reply.commentId
+            const comment = this.comments.find(item => item.com_id.toString() === this.reply.commentId)
+            comment && comment.reply_count++
+          } else {
+            // 表示是对文章评论
+            // 加到评论的头部
+            this.comments.unshift(res.new_obj)
+          }
+          this.value = ''// 清空评论内容
+        } catch (error) {
+          this.$hnotify({ message: '当前文章未开启评论功能' })
+        }
+        this.submiting = false // 状态关闭
+      } else {
+        try {
+          // 没登录 想评论要去登录
+          await this.$dialog.confirm({
+            message: '评论功能需要先登录哦'
+          })
+          // 点击确定要调到登录,登录后还能返回当前页面
+          this.$router.push({
+            path: '/login',
+            query: {
+              redirectUrl: this.$route.fullPath // 携带当前地址
+            }
+          })
+        } catch (error) {
+
+        }
+      }
+    },
     // 加载滚动条距离底部超过一定限制的时候
     async onLoad () {
       const { artId } = this.$route.query
