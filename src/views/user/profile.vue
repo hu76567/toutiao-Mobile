@@ -9,33 +9,39 @@
           height="1.5rem"
           fit="cover"
           round
-          src="https://img.yzcdn.cn/vant/cat.jpeg"
+          :src="user.photo"
         />
       </van-cell>
-      <van-cell is-link title="名称" value="用户名称" />
+      <van-cell is-link @click="showName=true" title="昵称" :value="user.name" />
       <van-cell is-link title="性别" value='男'/>
       <van-cell is-link title="生日" value="2019-08-08" />
     </van-cell-group>
-    <!-- 弹层组件 -->
-    <van-popup :close-on-click-overlay="false" v-model="showPhoto" style="width:80%">
-      <!-- 内容 -->
+
+    <!-- 头像弹层 -->
+    <van-popup  v-model="showPhoto" style="width:80%">
       <!-- 1 本地相册选择图片 -->
       <!-- 2 拍照 -->
-       <van-cell is-link title="本地相册选择图片"></van-cell>
-       <van-cell is-link title="拍照"></van-cell>
+      <van-cell is-link title="本地相册选择图片"></van-cell>
+      <van-cell is-link title="拍照"></van-cell>
     </van-popup>
 
-      <!-- 昵称弹层 -->
+    <!-- 昵称弹层 -->
+    <!-- 点击背景关闭弹窗 功能被禁用掉 -->
     <van-popup :close-on-click-overlay="false" v-model="showName" style="width:80%">
       <!-- 编辑用户昵称  双向绑定用户的昵称-->
+      <!-- 绑定错误提示信息 -->
       <van-field :error-message="nameMsg" v-model.trim="user.name" type='textarea'  rows="4"></van-field>
+      <van-button @click="btnName" block type="info" size="normal">确定</van-button>
     </van-popup>
 
-     <!-- 性别弹层 -->
-    <van-action-sheet @select="selectItem" :actions="actions" v-model="showGender" cancel-text="取消"></van-action-sheet>
+    <!-- 性别弹层 -->
+    <van-action-sheet
+    :actions="actions"
+    v-model="showGender"
+    cancel-text="取消"></van-action-sheet>
 
     <!-- 生日弹层 -->
-    <van-popup :close-on-click-overlay="false" v-model="showBirthDay" position="bottom">
+    <van-popup v-model="showBirthDay" position="bottom">
       <!-- 选择出生日期  出生日期应该小于现在时间-->
       <!-- type表示 当前的日期类型 年月日 -->
       <van-datetime-picker
@@ -53,35 +59,33 @@ export default {
   name: 'profile',
   data () {
     return {
-      showBirthDay: false, // 是否显示日期弹层
       showPhoto: false, // 是否显示选择头像弹层
       showName: false, // 是否显示编辑昵称的弹层
       showGender: false, // 是否显示性别选择的弹层
       actions: [{ name: '男' }, { name: '女' }], // 性别数据
+      showBirthDay: false, // 是否显示日期弹层
+      currentDate: new Date(), // 弹出弹层是默认显示的时间
       minDate: new Date(1900, 1, 1), // 最小时间
       maxDate: new Date(), // 生日最大时间 永远是小于等于当前时间的
-      currentDate: new Date(), // 当前时间
       user: {
-        name: null,
-        gender: null
-      }
+        name: '', // 昵称
+        gender: 1, // 性别默认值
+        birthday: '', // 生日
+        photo: ''// 头像
+      },
+      nameMsg: '' // 错误信息
     }
   },
   methods: {
     btnName () {
       if (this.user.name.length < 1 || this.user.name.length > 7) {
-        //  如果长度 小于1 或者大于7 表示 这个昵称不符合要求
+        //  如果内容长度 小于1 或者大于7 表示 这个昵称不符合要求
         this.nameMsg = '您的用户昵称不符合1-7的长度要求'
         return false // 不会继续往下执行了
       }
       // 如果满足的话 就会继续执行
       this.nameMsg = '' // 先把提示消息清空
       this.showName = false // 关闭弹层
-    },
-    selectItem (item) {
-      // item就是选择的对象
-      this.user.gender = item.name === '男' ? 0 : 1 // 根据判断得到当前的性别
-      this.showGender = false // 关闭当前的弹层
     }
   }
 }
