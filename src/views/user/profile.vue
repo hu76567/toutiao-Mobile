@@ -31,7 +31,7 @@
     <van-popup :close-on-click-overlay="false" v-model="showName" style="width:80%">
       <!-- 编辑用户昵称  双向绑定用户的昵称-->
       <!-- 绑定错误提示信息 -->
-      <van-field :error-message="nameMsg" v-model.trim="user.name" type='textarea'  rows="4"></van-field>
+      <van-field :error-message="nameMsg" v-model.trim="user.name" type='textarea'  rows="3"></van-field>
       <van-button @click="btnName" block type="info" size="normal">确定</van-button>
     </van-popup>
 
