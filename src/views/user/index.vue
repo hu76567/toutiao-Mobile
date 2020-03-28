@@ -60,10 +60,11 @@ export default {
   },
   methods: {
     // 将vuex中的方法映射过来
-    ...mapMutations(['delUser']),
+    ...mapMutations(['delUser', 'updatePhoto']),
     // 获取用户个人信息
     async getUserInfo () {
       this.userInfo = await getUserInfo()
+      this.updatePhoto({ photo: this.userInfo.photo }) // 调用mutation把头像设置到vuex
     },
     // 用户退出登录
     async logout () {
