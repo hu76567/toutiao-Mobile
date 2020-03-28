@@ -1,7 +1,7 @@
 <template>
   <!-- 文章列表组件 -->
   <!-- 放置这个div的目的是形成滚动条,用于做阅读记忆 -->
-  <div class="scroll-wrapper">
+  <div class="scroll-wrapper" @scroll="remember" ref="myScroll">
     <!-- 下拉刷新解构 -->
     <!-- 下拉刷新时会触发@refresh -->
     <!-- v-model控制是否加载完成 -->
@@ -69,7 +69,8 @@ export default {
       loading: false, // 是否开启上拉加载,默认为false
       finished: false, // 是否完成所有数据加载
       articles: [], // 文章列表数组
-      timestamp: null // 用来存放时间戳
+      timestamp: null, // 用来存放时间戳
+      scrollTop: 0 // 定义滚动的位置
     }
   },
   props: {
@@ -82,6 +83,15 @@ export default {
     }
   },
   methods: {
+    remember (event) {
+      // 记录滚动事件
+      // 防抖
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        // 记录当前滚动条的位置
+        this.scrollTop = event.target.scrollTop
+      }, 1000)
+    },
     // 上拉加载,进入时自动执行
     async onLoad () {
       /**
@@ -185,6 +195,28 @@ export default {
         }
       }
     })
+    eventbus.$on('changeTab', (id) => {
+    // 判断传入的id  找到对应的实例
+      if (id === this.channel_id) {
+        // 滚动滚动条
+        // this.$nextTick => 会在数据 响应式之后 页面渲染完毕之后执行
+        // this.$nextTick会保证在changeTab动作切换完成并且完成界面渲染之后执行
+        this.$nextTick(() => {
+          if (this.scrollTop && this.$refs.myScroll) {
+            this.$refs.myScroll.scrollTop = this.scrollTop
+          }
+        })
+      }
+    })
+  },
+  // activated  激活  => 一个组件 从 睡眠 状态 到 被唤醒  =>  触发 激活事件
+  // activated (钩子函数) 只会在 keep-alive包裹的情况下执行
+  activated () {
+  //  在激活函数中   判断
+    if (this.$refs.myScroll && this.scrollTop) {
+      // 将滚动条滚动到之前的记录的位置
+      this.$refs.myScroll.scrollTop = this.scrollTop
+    }
   }
 }
 </script>

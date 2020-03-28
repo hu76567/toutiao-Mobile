@@ -1,7 +1,7 @@
 <template>
     <div class='container'>
-       <!-- 放置tabs组件  默认绑定激活页签-->
-     <van-tabs v-model="activeIndex">
+       <!-- 放置tabs组件  默认绑定激活页签  监听页签切换事件-->
+     <van-tabs v-model="activeIndex" @change="changeTab">
        <!-- title为显示内容 -->
         <van-tab :title="item.name" v-for="item in channels" :key="item.id">
           <!-- 监听artticle-list组件中的×点击事件showAction -->
@@ -61,6 +61,11 @@ export default {
     }
   },
   methods: {
+    changeTab () {
+    //  广播一个事件切换页签事件
+    // 传出谁被激活了   id
+      eventbus.$emit('changeTab', this.channels[this.activeIndex].id)
+    },
     // 获取我的频道信息
     // 先从本地拉,拉不到就去线上拉
     async getmyChannels () {

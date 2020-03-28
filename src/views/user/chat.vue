@@ -29,28 +29,31 @@ export default {
   name: 'chat',
   data () {
     return {
-      XZimg,
+      XZimg, // 接收静态客服图片
       list: [], // 存储聊天内容
       value: '',
       loading: false
     }
   },
   computed: {
-    ...mapState(['photo', 'user']) // 用户头像地址
+    ...mapState(['photo', 'user']) // 引入vuex中存的用户头像
   },
   methods: {
     // 滚动条滚动到底部
     scrollBottom () {
+      // 由于我们的vue 是通过数据驱动视图, 但是数据变化之后, 视图的更新并不是同步的
       // 需要异步更新之后采取执行滚动
       // 比较scrollTop滚动条距离顶部的高度和整个容器的高度scrollHeight
       // this.$nextTick() 表示此函数会在上一次数据更新并且完成数据渲染之后执行
       this.$nextTick(() => {
       // 上一次的数据渲染完毕,视图也已经更新了
+      // 聊天面板上有内容变化是滚动到面板最下面
         this.$refs.myList.scrollTop = this.$refs.myList.scrollHeight
       })
       // 第二种是Vue.nextTick
     },
     send () {
+      // 调用websocket发出一个消息
       if (!this.value) return false // 为空不能发送消息
       this.loading = true // 设置加载
       // 使用websocket发送消息
@@ -72,9 +75,10 @@ export default {
       // 会拼接到url地址上
       query: { token: this.user.token }
     })
-    // 监听成功
     // 接收消息 connect表示当前已经建立链接成功
     this.socket.on('connect', () => {
+      //  此时执行 connect事件 表示 已经和服务器打通了电话
+      // 我们模拟一条数据 让用户看到 服务器和用户说话了
       this.list.push({ msg: '现在可以和我聊天啦', name: 'xz' })
     })
     // 监听回复的消息

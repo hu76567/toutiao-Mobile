@@ -5,7 +5,10 @@
     <!-- 二级路由容器  首页/问答/视频/我的-->
     <!-- :class="{ 名称: 布尔值 }" -->
     <div class="my-wrapper" :class="{ noTop: !showNavBar }">
-      <router-view></router-view>
+      <!-- 包裹路由组件 开启组件缓存 -->
+      <keep-alive>
+         <router-view></router-view>
+      </keep-alive>
     </div>
     <!-- 标签栏  开启路由模式 route :route="true"(布尔)  route="true"(字符串)-->
     <van-tabbar route>

@@ -26,7 +26,7 @@ export default new Vuex.Store({
       auth.delUser() // 删除本地缓存中的token
     },
     updatePhoto (state, payload) {
-      state.photo = payload.photo
+      state.photo = payload.photo // 用来更新小智聊天中的用户头像
     }
   },
   actions: {
