@@ -1,7 +1,7 @@
 <template>
       <div class="container">
     <van-nav-bar fixed left-arrow @click-left="$router.back()" title="小爱同学"></van-nav-bar>
-    <div class="chat-list">
+    <div class="chat-list" ref="myList">
       <div class="chat-item" :class="{left: item.name === 'xz', right: item.name!='xz' }" v-for="(item,index) in list" :key="index">
         <van-image v-if="item.name==='xz'" fit="cover" round :src="XZimg" />
         <div class="chat-pao">{{item.msg}}</div>
@@ -39,6 +39,17 @@ export default {
     ...mapState(['photo', 'user']) // 用户头像地址
   },
   methods: {
+    // 滚动条滚动到底部
+    scrollBottom () {
+      // 需要异步更新之后采取执行滚动
+      // 比较scrollTop滚动条距离顶部的高度和整个容器的高度scrollHeight
+      // this.$nextTick() 表示此函数会在上一次数据更新并且完成数据渲染之后执行
+      this.$nextTick(() => {
+      // 上一次的数据渲染完毕,视图也已经更新了
+        this.$refs.myList.scrollTop = this.$refs.myList.scrollHeight
+      })
+      // 第二种是Vue.nextTick
+    },
     send () {
       if (!this.value) return false // 为空不能发送消息
       this.loading = true // 设置加载
@@ -52,6 +63,7 @@ export default {
       this.list.push(obj) // 追加到消息队列
       this.value = '' // 清空输入框
       this.loading = false // 关闭加载状态
+      this.scrollBottom() // 滚动条滚动到底部
     }
   },
   created () {
@@ -68,7 +80,12 @@ export default {
     // 监听回复的消息
     this.socket.on('message', res => {
       this.list.push({ ...res, name: 'xz' })
+      this.scrollBottom()
     })
+  },
+  beforeDestroy () {
+  //  实例销毁前 关闭websocket连接
+    this.socket.close()
   }
 }
 </script>
