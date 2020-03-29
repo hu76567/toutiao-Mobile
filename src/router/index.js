@@ -25,7 +25,11 @@ const routes = [
     component: Layout,
     children: [{
       path: '',
-      component: home // 首页
+      component: home, // 首页
+      // 如果一级路由存在默认的二级路由,那么meta属性应该写在二级路由的对象上
+      meta: {
+        isAlive: true // 是否缓存组件实例
+      }
     }, {
       path: '/question',
       component: question // 问答
