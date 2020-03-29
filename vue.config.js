@@ -12,5 +12,14 @@ module.exports = {
         }
       }
     }
-  }
+  },
+  configureWebpack: (config) => {
+    // config就是vue-cli中所有的webpack配置
+    // 判断是生产环境还是开发环境
+    if (process.env.NODE_ENV === 'production') {
+      // 只需要在生产环境中把所有console删除在打包
+      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
+    }
+  },
+  publicPath: './'// 打包后的引用地址
 }
