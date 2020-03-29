@@ -18,6 +18,7 @@ module.exports = {
     // 判断是生产环境还是开发环境
     if (process.env.NODE_ENV === 'production') {
       // 只需要在生产环境中把所有console删除在打包
+      // 删除不是删除源代码的console,是删除打包完的
       config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true
     }
   },
